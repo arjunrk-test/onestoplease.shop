@@ -1,23 +1,24 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"; 
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
-import { signOut } from "firebase/auth";
-import { auth } from "@/firebase";
-import { useAuth } from "@/components/AuthProvider";
 import { ChevronDown } from "lucide-react";
 import { CiLogout } from "react-icons/ci";
 import { ProfileList } from "@/app/constants";
 
 const ProfileDropdown = () => {
-  const { user } = useAuth();
+  // Placeholder user check — replace with Supabase auth later
+  const user = true;
 
   return (
     <div className="relative">
       {user ? (
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <Button variant="default" className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlight/80">
+            <Button
+              variant="default"
+              className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlight/80"
+            >
               Profile <ChevronDown className="w-4 h-4" />
             </Button>
           </DropdownMenu.Trigger>
@@ -39,15 +40,18 @@ const ProfileDropdown = () => {
 
             <DropdownMenu.Item>
               <Button
-                onClick={() => signOut(auth)}
+                onClick={() => {
+                  // Replace with Supabase logout logic later
+                  console.log("User logged out");
+                }}
                 variant="default"
                 className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlight/80 rounded-md"
               >
-                <CiLogout className="text-2xl"/>Logout
+                <CiLogout className="text-2xl" />
+                Logout
               </Button>
             </DropdownMenu.Item>
           </DropdownMenu.Content>
-
         </DropdownMenu.Root>
       ) : (
         <Link href="/login">

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -21,7 +20,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Instant theme script */}
@@ -48,6 +46,5 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
-    </AuthProvider>
   );
 }

@@ -1,17 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useAuth } from "@/components/AuthProvider";
-import ProfileDropdown from "@/components/ProfileDropdown"; 
 import { useState } from "react";
 import { Locations } from "@/app/constants";
 import { Input } from "./ui/input";
-import OtpLoginDialog from "./OtpLoginDialog";
 import ThemeToggle from "./ThemeToogle";
 
-
 export default function Navbar() {
-  const { user } = useAuth();
-  const [location, setLocation] = useState("Chennai"); // Replace with real location logic later
+  const [location, setLocation] = useState("Chennai"); // Static for now
 
   return (
     <nav className="w-full sticky top-0 px-48 py-4 bg-gray shadow-sm flex items-center justify-between">
@@ -33,7 +28,7 @@ export default function Navbar() {
         ))}
       </select>
 
-      {/* Search bar */}
+      {/* Search Bar */}
       <Input
         type="text"
         placeholder="Search for furniture, appliances..."
@@ -42,13 +37,12 @@ export default function Navbar() {
 
       <ThemeToggle />
 
-      {/* Auth Button / Profile */}
+      {/* Placeholder for future login/profile */}
       <div>
-        {user ? (
-          <ProfileDropdown />
-        ) : (
-          <OtpLoginDialog />
-        )}
+        {/* Authentication removed */}
+        <button className="text-sm text-highlight border border-highlight px-3 py-1 rounded">
+          Login
+        </button>
       </div>
     </nav>
   );
