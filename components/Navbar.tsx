@@ -4,9 +4,13 @@ import { useState } from "react";
 import { Locations } from "@/app/constants";
 import { Input } from "./ui/input";
 import ThemeToggle from "./ThemeToogle";
+import OtpLoginDialog from "./OtpLoginDialog";
+import { useSupabaseUser } from "@/hooks/useSupabaseUser"; // We'll create this hook
+import ProfileDropdown from "./ProfileDropdown"; // Visible only if user is logged in
 
 export default function Navbar() {
-  const [location, setLocation] = useState("Chennai"); // Static for now
+  const [location, setLocation] = useState("Chennai");
+  const user = useSupabaseUser(); // Custom hook to get Supabase user
 
   return (
     <nav className="w-full sticky top-0 px-48 py-4 bg-gray shadow-sm flex items-center justify-between">
@@ -37,12 +41,9 @@ export default function Navbar() {
 
       <ThemeToggle />
 
-      {/* Placeholder for future login/profile */}
+      {/* Auth Button / Profile */}
       <div>
-        {/* Authentication removed */}
-        <button className="text-sm text-highlight border border-highlight px-3 py-1 rounded">
-          Login
-        </button>
+        {user ? <ProfileDropdown /> : <OtpLoginDialog />}
       </div>
     </nav>
   );
