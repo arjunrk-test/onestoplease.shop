@@ -72,19 +72,19 @@ export default function Furniture() {
 
       <Tabs defaultValue="livingroom" className="w-full mt-8">
         <TabsList className="grid w-full grid-cols-5 bg-highlight">
-          <TabsTrigger value="livingroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80">
+          <TabsTrigger value="livingroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Living&nbsp;Room
           </TabsTrigger>
-          <TabsTrigger value="kitchen" className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80">
+          <TabsTrigger value="kitchen" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Kitchen&nbsp;&amp;&nbsp;Dining
           </TabsTrigger>
-          <TabsTrigger value="bedroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80">
+          <TabsTrigger value="bedroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Bedroom
           </TabsTrigger>
-          <TabsTrigger value="work" className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80">
+          <TabsTrigger value="work" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Work
           </TabsTrigger>
-          <TabsTrigger value="baby" className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80">
+          <TabsTrigger value="baby" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Baby
           </TabsTrigger>
         </TabsList>
@@ -92,7 +92,7 @@ export default function Furniture() {
         <TabsContent value="livingroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
           <div className="grid grid-cols-3 gap-4 mt-4">
             {livingRoomProducts.map((product) => (
-              <div key={product.id} className="bg-background rounded-lg shadow p-4">
+              <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
                 <img
                   src={product.image_url}
                   alt={product.name}
@@ -109,7 +109,7 @@ export default function Furniture() {
         <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
          <div className="grid grid-cols-3 gap-4 mt-4">
                {kitchenProducts.map((product) => (
-               <div key={product.id} className="bg-background rounded-lg shadow p-4">
+               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
                   <img
                      src={product.image_url}
                      alt={product.name}
