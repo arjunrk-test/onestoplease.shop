@@ -15,6 +15,7 @@ interface Product {
 
 export default function Furniture() {
   const [livingRoomProducts, setLivingRoomProducts] = useState<Product[]>([]);
+  const [kitchenProducts, setKitchenProducts] = useState<Product[]>( [] );
 
   useEffect(() => {
     const fetchLivingRoomProducts = async () => {
@@ -33,6 +34,24 @@ export default function Furniture() {
 
     fetchLivingRoomProducts();
   }, []);
+
+  useEffect(() => {
+   const fetchKitchenProducts = async () => {
+     const { data, error } = await supabase
+       .from("products")
+       .select("*")
+       .eq("category", "Furniture")
+       .eq("subcategory", "Kitchen");
+
+     if (error) {
+       console.error("Error fetching furniture products:", error);
+     } else {
+       setKitchenProducts(data || []);
+     }
+   };
+
+   fetchKitchenProducts();
+ }, []);
 
   return (
     <main className="h-[calc(100vh-112px)] bg-gray text-foreground flex flex-col items-start p-6 px-48">
@@ -87,7 +106,22 @@ export default function Furniture() {
         </TabsContent>
 
         {/* Other tabs stay empty for now */}
-        <TabsContent value="kitchen" />
+        <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
+         <div className="grid grid-cols-3 gap-4 mt-4">
+               {kitchenProducts.map((product) => (
+               <div key={product.id} className="bg-background rounded-lg shadow p-4">
+                  <img
+                     src={product.image_url}
+                     alt={product.name}
+                     className="w-full h-40 object-cover rounded"
+                  />
+                  <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                  <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+               </div>
+               ))}
+            </div>
+        </TabsContent>
+
         <TabsContent value="bedroom" />
         <TabsContent value="work" />
         <TabsContent value="baby" />
