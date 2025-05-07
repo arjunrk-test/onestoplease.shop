@@ -1,14 +1,14 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { CiLogout } from "react-icons/ci";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/AuthProvider";
 import { ProfileList } from "@/app/constants";
 
 const ProfileDropdown = () => {
-  // Placeholder user check — replace with Supabase auth later
-  const user = true;
+  const { user, signOut } = useAuth();
 
   return (
     <div className="relative">
@@ -23,7 +23,7 @@ const ProfileDropdown = () => {
             </Button>
           </DropdownMenu.Trigger>
 
-          <DropdownMenu.Content className="bg-white shadow-md rounded-md p-2 mt-2 min-w-[160px] text-left">
+          <DropdownMenu.Content className="bg-white shadow-md rounded-md p-2 mt-2 min-w-[160px] text-left z-[999]">
             {ProfileList.map((item) => (
               <DropdownMenu.Item asChild key={item.name}>
                 <Link
@@ -40,15 +40,11 @@ const ProfileDropdown = () => {
 
             <DropdownMenu.Item>
               <Button
-                onClick={() => {
-                  // Replace with Supabase logout logic later
-                  console.log("User logged out");
-                }}
+                onClick={signOut}
                 variant="default"
                 className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlight/80 rounded-md"
               >
-                <CiLogout className="text-2xl" />
-                Logout
+                <CiLogout className="text-2xl" /> Logout
               </Button>
             </DropdownMenu.Item>
           </DropdownMenu.Content>

@@ -1,3 +1,25 @@
+// "use client";
+// import { useState } from "react";
+// import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+// import OtpLogin from "./OtpLogin";
+// import { Button } from "./ui/button";
+
+// export default function OtpLoginDialog() {
+//   const [open, setOpen] = useState(false);
+
+//   return (
+//     <Dialog open={open} onOpenChange={setOpen}>
+//       <DialogTrigger asChild>
+//         <Button variant="outline">Login</Button>
+//       </DialogTrigger>
+
+//       <DialogContent className="sm:max-w-md">
+//         <OtpLogin closeDialog={() => setOpen(false)} />
+//       </DialogContent>
+//     </Dialog>
+//   );
+// }
+
 "use client";
 import React, { useState } from "react";
 import {
