@@ -3,6 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/AuthProvider";
+import NProgressHandler from "@/components/NProgress";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -43,7 +44,10 @@ export default function RootLayout({
         </head>
         <body className={`${jetbrainsMono.variable} antialiased`}>
           <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <NProgressHandler />
+              {children}
+            </AuthProvider>
           </ThemeProvider>
         </body>
       </html>
