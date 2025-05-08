@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 body {
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: 'Satoshi', sans-serif;
 }
-  
+
 @layer base {
   :root {
     --background: white;
@@ -14,7 +14,7 @@ body {
     --highlight: #3BBA9C;
     --gray-inverted: #2A2B30;
   }
-  
+
   .dark {
     --background: #181818;
     --foreground: white;
@@ -54,7 +54,7 @@ body {
 }
 
 #nprogress .bar {
-  background: red !important; /* Match your theme highlight color */
+  background: red !important;
   position: fixed;
   z-index: 9999;
   top: 0;

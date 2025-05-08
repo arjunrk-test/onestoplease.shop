@@ -6,9 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
-import { auth, db } from "@/firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function Settings() {
   const [firstName, setFirstName] = useState("");
@@ -16,48 +13,9 @@ export default function Settings() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [whatsappNotifications, setWhatsappNotifications] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
 
-  // 🔐 Get current logged-in user
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        setPhoneNumber(firebaseUser.phoneNumber || "");
-
-        // Prefill data if already saved
-        const docRef = doc(db, "users", firebaseUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setFirstName(data.firstName || "");
-          setLastName(data.lastName || "");
-          setEmail(data.email || "");
-          setWhatsappNotifications(data.whatsappNotifications || false);
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const handleSave = async () => {
-    // const user = auth.currentUser;
-    // if (!user) {
-    //   console.error("No user is logged in.");
-    //   return;
-    // }
-
-    // // Save user data to Firestore
-    // await setDoc(doc(db, "users", user.uid), {
-    //   firstName,
-    //   lastName,
-    //   email,
-    //   phoneNumber: user.phoneNumber,
-    //   whatsappNotifications,
-    // });
-
-    // console.log("User data saved to Firestore.");
     alert("Save feature coming soon!");
   };
 
