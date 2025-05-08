@@ -8,10 +8,8 @@ export default function PagesNav() {
   const currentItem = CategoriesPath.find(category => pathname === category.pathName)?.name || 'Home';
 
   return (
-    <div className="bg-background sticky top-[64px] z-20 py-4 px-48 shadow-md">
-      {/* Flex Container for Breadcrumbs and Menu Items */}
+    <div className="bg-background sticky top-[64px] z-10 py-4 px-48 shadow-md">
       <div className="flex justify-between items-center px-6">
-        {/* Breadcrumbs (Aligned Left) */}
         <nav className="text-highlight text-xs">
           <span 
             className='cursor-pointer'
@@ -22,8 +20,7 @@ export default function PagesNav() {
           <span className="text-foreground text-xs">{currentItem}</span>
         </nav>
 
-        {/* Menu Items (Aligned Right) */}
-        <ul className="flex  gap-6">
+        <ul className="flex gap-6">
           {CategoriesPath.map((category) => (
             <li
               key={category.category}

@@ -40,7 +40,7 @@ export default function OtpLoginDialog() {
          <DialogTrigger asChild>
             <Button
                variant="default"
-               className="px-6 py-3 h-8 text-md bg-highlight hover:bg-highlight/80"
+               className="px-6 py-3 h-8 text-md text-white bg-highlight hover:bg-highlight/80"
             >
                Login
             </Button>
