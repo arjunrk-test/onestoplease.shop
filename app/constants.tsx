@@ -74,12 +74,12 @@ export const Locations = [
        path: "/admin/products",
        icons: ClipboardList,
        submenu: [
-         { name: "Furniture", path: "/admin/products/add-furniture/", icon: <IoBedOutline /> },
-         { name: "Appliances", path: "/admin/products/add-appliances/", icon: <LuWashingMachine  /> },
-         { name: "Electronics", path: "/admin/products/add-electronics/", icon: <HiOutlineDevicePhoneMobile  /> },
-         { name: "Vehicles", path: "/admin/products/add-vehicles/", icon: <RiEBikeLine  /> },
-         { name: "Fitness", path: "/admin/products/add-fitness/", icon: <CiDumbbell  /> },
-         { name: "Baby", path: "/admin/products/add-baby/", icon: <PiBabyCarriageLight  /> },
+         { name: "Furniture", path: "/admin/products/furniture/", icon: <IoBedOutline /> },
+         { name: "Appliances", path: "/admin/products/appliances/", icon: <LuWashingMachine  /> },
+         { name: "Electronics", path: "/admin/products/electronics/", icon: <HiOutlineDevicePhoneMobile  /> },
+         { name: "Vehicles", path: "/admin/products/vehicles/", icon: <RiEBikeLine  /> },
+         { name: "Fitness", path: "/admin/products/fitness/", icon: <CiDumbbell  /> },
+         { name: "Baby", path: "/admin/products/baby-products/", icon: <PiBabyCarriageLight  /> },
        ],
      },
      {
