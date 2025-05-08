@@ -7,7 +7,6 @@ body {
 }
   
 @layer base {
-
   :root {
     --background: white;
     --foreground: #181818;
@@ -27,23 +26,43 @@ body {
   body {
     @apply font-primary bg-white text-black leading-loose;
   }
+
   .h1 {
     @apply text-[48px] xl:text-[80px] leading-[1.1] font-semibold;
   }
+
   .h2 {
     @apply text-[36px] xl:text-[48px] leading-[1.1] font-semibold;
   }
+
   .h3 {
     @apply text-[20px] xl:text-[24px] leading-[1.1] font-semibold;
   }
+
   .text-outline {
     -webkit-text-stroke: 1px #ffffff;
   }
-  
+
   .text-outline-hover {
     -webkit-text-stroke: 1px #FFD700;
   }
+}
 
-  
-  
+/* NProgress styles */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: red !important; /* Match your theme highlight color */
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+}
+
+#nprogress .peg {
+  display: none;
 }
