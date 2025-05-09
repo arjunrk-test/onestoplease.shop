@@ -142,37 +142,106 @@ export default function EditFurniture() {
       }
    };
 
-   const handleSubmit = (e: React.FormEvent) => {
+   const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+
       if (!validateForm()) return;
 
-      console.log("Form submitted!", { ...formData, image: selectedFile });
-      resetForm();
+      try {
+         const { name, description, category, subcategory, price, stock } = formData;
+
+         // Step 1: Clean and generate filename
+         const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+         const extension = selectedFile?.name.split('.').pop()?.toLowerCase();
+         const fileName = `${cleanName}.${extension}`;
+         
+         // Step 2: Create the storage path based on category and subcategory
+         const storagePath = `${category}/${subcategory}/${fileName}`;
+
+         // Step 3: Upload image to Supabase Storage
+         const { error: uploadError } = await supabase.storage
+            .from('products')
+            .upload(storagePath, selectedFile!, {
+               cacheControl: '3600',
+               upsert: true
+            });
+
+         if (uploadError) {
+            console.error("Image upload failed:", uploadError.message);
+            setErrors((prev) => ({ ...prev, image: "Failed to upload image." }));
+            return;
+         }
+
+         // Step 4: Get public URL of uploaded image
+         const { data: { publicUrl } } = supabase.storage
+            .from('products')
+            .getPublicUrl(storagePath);
+
+         // Step 5: Insert into products table
+         const { error: insertError } = await supabase
+            .from('products')
+            .insert([
+               {
+                  name,
+                  description,
+                  category,
+                  subcategory,
+                  price: Number(price),
+                  stock: Number(stock),
+                  image_url: publicUrl,
+               },
+            ]);
+
+         if (insertError) {
+            console.error("Product insert failed:", insertError.message);
+            setErrors((prev) => ({ ...prev, submit: "Failed to add product." }));
+            return;
+         }
+
+         // Step 6: Refresh product list and reset form
+         setIsDialogOpen(false);
+         resetForm();
+
+         // Refresh the products list
+         const { data } = await supabase
+            .from('products')
+            .select('*')
+            .eq('category', 'Furniture');
+         setProducts(data || []);
+      } catch (err) {
+         console.error("Unexpected error:", err);
+         setErrors((prev) => ({ ...prev, submit: "An unexpected error occurred." }));
+      }
    };
+
+
 
    return (
       <main>
-         <h1 className="text-2xl font-bold text-highlight mb-4">Edit Furniture</h1>
+         <div className="flex justify-between items-center mb-4 px-0 sticky top-0">
+            <h1 className="text-2xl font-bold text-highlight">Edit Furniture</h1>
 
-         <div className="flex justify-end gap-4 pr-8">
-            <TooltipProvider>
-               {editButtons.map((button) => (
-                  <Tooltip key={button.name}>
-                     <TooltipTrigger asChild>
-                        <div
-                           onClick={button.executeFunction}
-                           className={`${button.bgColour} text-background cursor-pointer p-3 rounded-lg flex items-center justify-center`}
-                        >
-                           <span className="text-md">{button.icon}</span>
-                        </div>
-                     </TooltipTrigger>
-                     <TooltipContent className="bg-foreground text-background">
-                        <p>{button.tooltipValue}</p>
-                     </TooltipContent>
-                  </Tooltip>
-               ))}
-            </TooltipProvider>
+            <div className="flex gap-4">
+               <TooltipProvider>
+                  {editButtons.map((button) => (
+                     <Tooltip key={button.name}>
+                        <TooltipTrigger asChild>
+                           <div
+                              onClick={button.executeFunction}
+                              className={`${button.bgColour} text-background cursor-pointer p-3 rounded-lg flex items-center justify-center`}
+                           >
+                              <span className="text-md">{button.icon}</span>
+                           </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-foreground text-background">
+                           <p>{button.tooltipValue}</p>
+                        </TooltipContent>
+                     </Tooltip>
+                  ))}
+               </TooltipProvider>
+            </div>
          </div>
+
 
          <div className="mb-6 mt-8">
             <label className="mr-2 text-sm font-medium">Filter by Subcategory:</label>
