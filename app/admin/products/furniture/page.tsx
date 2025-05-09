@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
    Dialog,
@@ -18,11 +18,59 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Product {
+   id: string;
+   name: string;
+   description: string;
+   price: number;
+   stock: number;
+   image_url?: string;
+}
+
 
 export default function EditFurniture() {
+
+   const subcategories = ["All", "Livingroom", "Bedroom", "Kitchen", "Work", "Baby"];
+   const [selectedSubcategory, setSelectedSubcategory] = useState("All");
+
+
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [selectedFile, setSelectedFile] = useState<File | null>(null);
    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+   const [products, setProducts] = useState<Product[]>([]);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchProducts = async () => {
+         setLoading(true);
+
+         let query = supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Furniture");
+
+         if (selectedSubcategory !== "All") {
+            query = query.eq("subcategory", selectedSubcategory);
+         }
+
+         const { data, error } = await query;
+
+         if (error) {
+            console.error("Error fetching products:", error.message);
+         } else {
+            setProducts(data);
+         }
+
+         setLoading(false);
+      };
+
+      fetchProducts();
+   }, [selectedSubcategory]);
+
+
 
    const [formData, setFormData] = useState({
       name: "",
@@ -125,6 +173,52 @@ export default function EditFurniture() {
                ))}
             </TooltipProvider>
          </div>
+
+         <div className="mb-6 mt-8">
+            <label className="mr-2 text-sm font-medium">Filter by Subcategory:</label>
+            <select
+               value={selectedSubcategory}
+               onChange={(e) => setSelectedSubcategory(e.target.value)}
+               className="px-3 py-1 border border-gray-300 rounded-md bg-background text-foreground text-sm"
+            >
+               {subcategories.map((sub) => (
+                  <option key={sub} value={sub}>
+                     {sub}
+                  </option>
+               ))}
+            </select>
+         </div>
+
+
+         <div className="mt-10">
+            <h2 className="text-xl font-semibold mb-4 text-highlight">Furniture Products</h2>
+
+            {loading ? (
+               <p>Loading products...</p>
+            ) : products.length === 0 ? (
+               <p>No products found.</p>
+            ) : (
+               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {products.map((product) => (
+                     <div key={product.id} className="border border-gray rounded-lg p-4 bg-background shadow-md">
+                        {product.image_url && (
+                           <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-40 object-cover mb-4 rounded-md"
+                           />
+                        )}
+                        <h3 className="text-lg font-bold text-highlight">{product.name}</h3>
+                        <p className="text-sm text-foreground mt-1">{product.description}</p>
+                        <div className="mt-2 text-sm text-muted">
+                           ₹{product.price} • Stock: {product.stock}
+                        </div>
+                     </div>
+                  ))}
+               </div>
+            )}
+         </div>
+
 
          <Dialog
             open={isDialogOpen}
