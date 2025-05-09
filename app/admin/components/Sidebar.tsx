@@ -67,8 +67,8 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-transparent">
-      <div className="flex flex-col bg-black w-72 h-full text-white rounded-lg shadow-sm overflow-y-auto max-h-screen">
+    <div className="p-2 bg-transparent">
+      <div className="flex flex-col bg-black/80 w-72 h-full text-white rounded-lg shadow-sm overflow-y-auto max-h-screen">
         {/* Sidebar Header */}
         <div className="flex items-center p-4 text-xl font-bold">
           {userEmail && (
@@ -138,7 +138,7 @@ const Sidebar: React.FC = () => {
                               }`}
                           >
                             <span className="flex items-center gap-2 capitalize">
-                              <SubIcon className="text-md text-highlight group-hover:text-white" />
+                              <SubIcon className="text-[18px] text-yellow-500 group-hover:text-white" />
                               {subLink.name}
                             </span>
                           </div>

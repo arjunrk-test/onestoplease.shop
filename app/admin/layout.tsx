@@ -70,7 +70,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
-      <main className="flex-1 m-4 p-6 bg-black text-white rounded-xl shadow-lg overflow-y-auto">
+      <main className="flex-1 m-2 p-6 bg-black/80 text-white rounded-xl shadow-lg overflow-y-auto">
         {children}
       </main>
     </div>
