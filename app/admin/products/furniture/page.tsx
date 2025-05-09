@@ -214,10 +214,8 @@ export default function EditFurniture() {
       }
    };
 
-
-
    return (
-      <main>
+      <main className="h-[calc(100vh-64px)] flex flex-col overflow-hidden p-6">
          <div className="flex justify-between items-center mb-4 px-0 sticky top-0">
             <h1 className="text-2xl font-bold text-highlight">Edit Furniture</h1>
 
@@ -259,9 +257,7 @@ export default function EditFurniture() {
          </div>
 
 
-         <div className="mt-10">
-            <h2 className="text-xl font-semibold mb-4 text-highlight">Furniture Products</h2>
-
+         <div className="overflow-y-auto mt-4 pr-1 scrollbar-hide">
             {loading ? (
                <p>Loading products...</p>
             ) : products.length === 0 ? (
