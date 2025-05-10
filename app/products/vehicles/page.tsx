@@ -1,8 +1,79 @@
 "use client"
 import { RiEBikeLine } from "react-icons/ri";
 import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Product {
+   id: number;
+   name: string;
+   price: number;
+   image_url: string;
+   category: string;
+   subCategory: string;
+}
 
 export default function Vehicles(){
+
+   const [scooters, setScooters] = useState<Product[]>( [] );
+   const [bikes, setBikes] = useState<Product[]>( [] );
+   const [cars, setCars] = useState<Product[]>( [] );
+
+   useEffect(() => {
+      const fetchScooters = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Vehicles")
+            .eq("subcategory", "Scooters");
+
+         if (error) {
+            console.error("Error fetching vehicles products:", error);
+         } else {
+            setScooters(data || []);
+         }
+      };
+
+      fetchScooters();
+   }, []);
+
+   useEffect(() => {
+      const fetchBikes = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Vehicles")
+            .eq("subcategory", "Bikes");
+
+         if (error) {
+            console.error("Error fetching vehicles products:", error);
+         } else {
+            setBikes(data || []);
+         }
+      };
+
+      fetchBikes();
+   }, []);
+   
+   useEffect(() => {
+      const fetchCars = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Vehicles")
+            .eq("subcategory", "Cars");
+
+         if (error) {
+            console.error("Error fetching vehicles products:", error);
+         } else {
+            setCars(data || []);
+         }
+      };
+
+      fetchCars();
+   }, []);
+
+
    return (
             <main className="h-[calc(100vh-112px)] bg-gray text-foreground flex flex-col items-start p-6 px-48">
                <div className="flex items-center gap-4">
@@ -32,22 +103,52 @@ export default function Vehicles(){
                   </TabsList>
       
                   <TabsContent value="scooters" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                     <div className="grid grid-cols-3 gap-4 mt-4">
-                        
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {scooters.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
                      </div>
-                  </TabsContent>
+                  ))}
+               </div>
+            </TabsContent>
       
                   <TabsContent value="bikes" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                     <div className="grid grid-cols-3 gap-4 mt-4">
-                        
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {bikes.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
                      </div>
-                  </TabsContent>
+                  ))}
+               </div>
+            </TabsContent>
 
                   <TabsContent value="cars" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                     <div className="grid grid-cols-3 gap-4 mt-4">
-                        
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {cars.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
                      </div>
-                  </TabsContent>
+                  ))}
+               </div>
+            </TabsContent>
       
                </Tabs>
             </main>
