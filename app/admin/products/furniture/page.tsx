@@ -1,21 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { IoMdAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
-import {
-   TooltipProvider,
-   Tooltip,
-   TooltipContent,
-   TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabaseClient";
@@ -29,24 +19,20 @@ interface Product {
    image_url?: string;
 }
 
-
 export default function EditFurniture() {
 
    const subcategories = ["All", "Livingroom", "Bedroom", "Kitchen", "Work", "Baby"];
    const [selectedSubcategory, setSelectedSubcategory] = useState("All");
-
-
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [selectedFile, setSelectedFile] = useState<File | null>(null);
    const fileInputRef = useRef<HTMLInputElement | null>(null);
-
    const [products, setProducts] = useState<Product[]>([]);
    const [loading, setLoading] = useState(true);
 
+   //Products fetching and display
    useEffect(() => {
       const fetchProducts = async () => {
          setLoading(true);
-
          let query = supabase
             .from("products")
             .select("*")
@@ -55,22 +41,16 @@ export default function EditFurniture() {
          if (selectedSubcategory !== "All") {
             query = query.eq("subcategory", selectedSubcategory);
          }
-
          const { data, error } = await query;
-
          if (error) {
             console.error("Error fetching products:", error.message);
          } else {
             setProducts(data);
          }
-
          setLoading(false);
       };
-
       fetchProducts();
    }, [selectedSubcategory]);
-
-
 
    const [formData, setFormData] = useState({
       name: "",
@@ -82,31 +62,11 @@ export default function EditFurniture() {
    });
 
    const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
    const addFurniture = () => setIsDialogOpen(true);
-
    const editButtons = [
-      {
-         name: "add",
-         bgColour: "bg-green-500",
-         tooltipValue: "Add Furniture",
-         icon: <IoMdAdd />,
-         executeFunction: addFurniture,
-      },
-      {
-         name: "delete",
-         bgColour: "bg-red-500",
-         tooltipValue: "Delete Furniture",
-         icon: <MdDeleteOutline />,
-         executeFunction: () => console.log("Delete clicked"),
-      },
-      {
-         name: "edit",
-         bgColour: "bg-yellow-500",
-         tooltipValue: "Edit details",
-         icon: <CiEdit />,
-         executeFunction: () => console.log("Edit clicked"),
-      },
+      { name: "add", bgColour: "bg-green-500", tooltipValue: "Add Furniture", icon: <IoMdAdd />, executeFunction: addFurniture, },
+      { name: "delete", bgColour: "bg-red-500", tooltipValue: "Delete Furniture", icon: <MdDeleteOutline />, executeFunction: () => console.log("Delete clicked"),},
+      { name: "edit", bgColour: "bg-yellow-500", tooltipValue: "Edit details", icon: <CiEdit />, executeFunction: () => console.log("Edit clicked"), },
    ];
 
    const handleChange = (field: string, value: string) => {
@@ -240,7 +200,6 @@ export default function EditFurniture() {
             </div>
          </div>
 
-
          <div className="mb-6 mt-8">
             <label className="mr-2 text-sm font-medium">Filter by Subcategory:</label>
             <select
@@ -255,7 +214,6 @@ export default function EditFurniture() {
                ))}
             </select>
          </div>
-
 
          <div className="overflow-y-auto mt-4 pr-1 scrollbar-hide">
             {loading ? (
@@ -283,7 +241,6 @@ export default function EditFurniture() {
                </div>
             )}
          </div>
-
 
          <Dialog
             open={isDialogOpen}
