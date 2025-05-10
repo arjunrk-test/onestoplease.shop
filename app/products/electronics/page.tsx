@@ -6,7 +6,59 @@ import {
    TabsList,
    TabsTrigger,
 } from "@/components/ui/tabs"
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Product {
+   id: number;
+   name: string;
+   price: number;
+   image_url: string;
+   category: string;
+   subCategory: string;
+}
+
 export default function Electronics() {
+
+   const [smartphonesProducts, setSmartphonesProducts] = useState<Product[]>([]);
+   const [laptopProducts, setLaptopProducts] = useState<Product[]>([]);
+
+   useEffect(() => {
+      const fetchSmartphonesProducts = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Electronics")
+            .eq("subcategory", "Smartphones");
+
+         if (error) {
+            console.error("Error fetching electronics products:", error);
+         } else {
+            setSmartphonesProducts(data || []);
+         }
+      };
+
+      fetchSmartphonesProducts();
+   }, []);
+
+   useEffect(() => {
+      const fetchLaptopsProducts = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Electronics")
+            .eq("subcategory", "Laptops");
+
+         if (error) {
+            console.error("Error fetching electronics products:", error);
+         } else {
+            setLaptopProducts(data || []);
+         }
+      };
+
+      fetchLaptopsProducts();
+   }, []);
+
    return (
       <main className="h-[calc(100vh-112px)] bg-gray text-foreground flex flex-col items-start p-6 px-48">
          <div className="flex items-center gap-4">
@@ -29,15 +81,36 @@ export default function Electronics() {
                <TabsTrigger value="smartphones" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">Smartphones</TabsTrigger>
                <TabsTrigger value="laptops" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">Laptops</TabsTrigger>
             </TabsList>
+
             <TabsContent value="smartphones" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
-                  
+                  {smartphonesProducts.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
                </div>
             </TabsContent>
 
             <TabsContent value="laptops" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
-                  
+                  {laptopProducts.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
                </div>
             </TabsContent>
 
