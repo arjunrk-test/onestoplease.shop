@@ -20,11 +20,11 @@ interface Product {
 
 export default function Electronics() {
 
-   const [smartphonesProducts, setSmartphonesProducts] = useState<Product[]>([]);
-   const [laptopProducts, setLaptopProducts] = useState<Product[]>([]);
+   const [smartphones, setSmartphones] = useState<Product[]>([]);
+   const [laptop, setLaptop] = useState<Product[]>([]);
 
    useEffect(() => {
-      const fetchSmartphonesProducts = async () => {
+      const fetchSmartphones = async () => {
          const { data, error } = await supabase
             .from("products")
             .select("*")
@@ -34,15 +34,15 @@ export default function Electronics() {
          if (error) {
             console.error("Error fetching electronics products:", error);
          } else {
-            setSmartphonesProducts(data || []);
+            setSmartphones(data || []);
          }
       };
 
-      fetchSmartphonesProducts();
+      fetchSmartphones();
    }, []);
 
    useEffect(() => {
-      const fetchLaptopsProducts = async () => {
+      const fetchLaptops = async () => {
          const { data, error } = await supabase
             .from("products")
             .select("*")
@@ -52,11 +52,11 @@ export default function Electronics() {
          if (error) {
             console.error("Error fetching electronics products:", error);
          } else {
-            setLaptopProducts(data || []);
+            setLaptop(data || []);
          }
       };
 
-      fetchLaptopsProducts();
+      fetchLaptops();
    }, []);
 
    return (
@@ -84,12 +84,12 @@ export default function Electronics() {
 
             <TabsContent value="smartphones" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
-                  {smartphonesProducts.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                  {smartphones.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -100,12 +100,12 @@ export default function Electronics() {
 
             <TabsContent value="laptops" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
-                  {laptopProducts.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                  {laptop.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>

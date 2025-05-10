@@ -7,7 +7,7 @@ import ProductGrid from "@/app/admin/components/products/ProductGrid";
 import useProductManager from "@/app/admin/hooks/useProductManager";
 
 export default function FurniturePage() {
-  const subcategories = ["All", "Livingroom", "Bedroom", "Kitchen", "Work", "Baby"];
+  const subcategories = ["All", "Livingroom", "Bedroom", "Kitchen", "Work"];
 
   const {
     products,

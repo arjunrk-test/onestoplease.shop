@@ -125,11 +125,11 @@ export default function Fitness() {
             <TabsContent value="treadmills" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {treadmills.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -141,11 +141,11 @@ export default function Fitness() {
             <TabsContent value="crosstrainers" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {crossTrainers.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -157,11 +157,11 @@ export default function Fitness() {
             <TabsContent value="exercisebikes" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {exerciseBikes.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -173,11 +173,11 @@ export default function Fitness() {
             <TabsContent value="massagers" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {massagers.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>

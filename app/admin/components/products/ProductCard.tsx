@@ -23,7 +23,6 @@ interface ProductCardProps {
 export default function ProductCard({ product, onDelete, onEdit }: ProductCardProps) {
   const handleDelete = async () => {
     try {
-      // Step 1: Remove image from storage
       const imagePath = product.image_url?.split("/storage/v1/object/public/products/")[1];
       if (imagePath) {
         const { error: storageError } = await supabase.storage
@@ -36,7 +35,6 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
         }
       }
 
-      // Step 2: Remove product from DB
       const { error: deleteError } = await supabase
         .from("products")
         .delete()
@@ -47,7 +45,6 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
         return;
       }
 
-      // Step 3: Notify parent to update state
       onDelete(product.id);
     } catch (err) {
       console.error("Unexpected error during deletion:", err);
@@ -55,19 +52,22 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
   };
 
   return (
-    <div className="border border-gray rounded-lg p-4 bg-background shadow-md relative group">
+    <div className="border border-gray rounded-lg p-4 bg-background shadow-md relative group w-full">
       {product.image_url && (
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="w-full h-40 object-cover mb-4 rounded-md"
-        />
+        <div className="w-full aspect-square flex items-center justify-center bg-muted rounded-md mb-4">
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="max-w-full bg-white max-h-full object-contain"
+          />
+        </div>
       )}
 
       <h3 className="text-lg font-bold text-highlight">{product.name}</h3>
       <p className="text-sm text-foreground mt-1">{product.description}</p>
       <div className="mt-2 text-sm text-muted">
         ₹{product.price} • Stock: {product.stock}
+        <div>Subcategory: {product.subcategory}</div>
       </div>
 
       {/* Edit & Delete buttons */}

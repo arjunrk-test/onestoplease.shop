@@ -44,7 +44,7 @@ export default function Appliances(){
             .from("products")
             .select("*")
             .eq("category", "Appliances")
-            .eq("subcategory", "Kicthen");
+            .eq("subcategory", "Kitchen");
 
          if (error) {
             console.error("Error fetching appliances products:", error);
@@ -127,11 +127,11 @@ export default function Appliances(){
                <TabsContent value="livingroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {livingroom.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -141,13 +141,13 @@ export default function Appliances(){
             </TabsContent>
    
                <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-               <div className="grid grid-cols-3 gap-4 mt-4">
+               <div className="grid grid-cols-3 gap-  mt- ">
                   {kitchen.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -159,11 +159,11 @@ export default function Appliances(){
                <TabsContent value="bedroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {bedroom.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -175,11 +175,11 @@ export default function Appliances(){
                <TabsContent value="washing" className="max-h-[500px] overflow-y-auto scrollbar-hide">
                <div className="grid grid-cols-3 gap-4 mt-4">
                   {washing.map((product) => (
-                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                         <img
                            src={product.image_url}
                            alt={product.name}
-                           className="w-full h-40 object-cover rounded"
+                           className="max-w-full max-h-full object-contain rounded"
                         />
                         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">₹{product.price} / month</p>

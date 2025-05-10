@@ -14,12 +14,13 @@ interface Product {
 }
 
 export default function Furniture() {
-  const [livingRoomProducts, setLivingRoomProducts] = useState<Product[]>([]);
-  const [kitchenProducts, setKitchenProducts] = useState<Product[]>( [] );
-  const [workProducts, setWorkProducts] = useState<Product[]>( [] );
+  const [livingRoom, setLivingRoom] = useState<Product[]>([]);
+  const [kitchen, setKitchen] = useState<Product[]>( [] );
+  const [work, setWork] = useState<Product[]>( [] );
+  const [bedroom, setBedroom] = useState<Product[]>( [] );
 
   useEffect(() => {
-    const fetchLivingRoomProducts = async () => {
+    const fetchLivingRoom = async () => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -29,15 +30,15 @@ export default function Furniture() {
       if (error) {
         console.error("Error fetching furniture products:", error);
       } else {
-        setLivingRoomProducts(data || []);
+        setLivingRoom(data || []);
       }
     };
 
-    fetchLivingRoomProducts();
+    fetchLivingRoom();
   }, []);
 
   useEffect(() => {
-   const fetchKitchenProducts = async () => {
+   const fetchKitchen = async () => {
      const { data, error } = await supabase
        .from("products")
        .select("*")
@@ -47,15 +48,15 @@ export default function Furniture() {
      if (error) {
        console.error("Error fetching furniture products:", error);
      } else {
-       setKitchenProducts(data || []);
+       setKitchen(data || []);
      }
    };
 
-   fetchKitchenProducts();
+   fetchKitchen();
  }, []);
 
  useEffect(() => {
-   const fetchWorkProducts = async () => {
+   const fetchWork = async () => {
      const { data, error } = await supabase
        .from("products")
        .select("*")
@@ -65,11 +66,29 @@ export default function Furniture() {
      if (error) {
        console.error("Error fetching furniture products:", error);
      } else {
-       setWorkProducts(data || []);
+       setWork(data || []);
      }
    };
 
-   fetchWorkProducts();
+   fetchWork();
+ }, []);
+
+ useEffect(() => {
+   const fetchBedroom = async () => {
+     const { data, error } = await supabase
+       .from("products")
+       .select("*")
+       .eq("category", "Furniture")
+       .eq("subcategory", "Bedroom");
+
+     if (error) {
+       console.error("Error fetching furniture products:", error);
+     } else {
+       setBedroom(data || []);
+     }
+   };
+
+   fetchBedroom();
  }, []);
 
   return (
@@ -90,7 +109,7 @@ export default function Furniture() {
       </div>
 
       <Tabs defaultValue="livingroom" className="w-full mt-8">
-        <TabsList className="grid w-full grid-cols-5 bg-highlight">
+        <TabsList className="grid w-full grid-cols-4 bg-highlight">
           <TabsTrigger value="livingroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Living&nbsp;Room
           </TabsTrigger>
@@ -103,19 +122,16 @@ export default function Furniture() {
           <TabsTrigger value="work" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
             Work
           </TabsTrigger>
-          <TabsTrigger value="baby" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Baby
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="livingroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
           <div className="grid grid-cols-3 gap-4 mt-4">
-            {livingRoomProducts.map((product) => (
-              <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+            {livingRoom.map((product) => (
+              <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                 <img
                   src={product.image_url}
                   alt={product.name}
-                  className="w-full h-40 object-cover rounded"
+                  className="max-w-full max-h-full object-contain rounded"
                 />
                 <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                 <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -127,12 +143,12 @@ export default function Furniture() {
         {/* Other tabs stay empty for now */}
         <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
          <div className="grid grid-cols-3 gap-4 mt-4">
-               {kitchenProducts.map((product) => (
-               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+               {kitchen.map((product) => (
+               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                   <img
                      src={product.image_url}
                      alt={product.name}
-                     className="w-full h-40 object-cover rounded"
+                     className="max-w-full max-h-full object-contain rounded"
                   />
                   <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                   <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -141,15 +157,14 @@ export default function Furniture() {
             </div>
         </TabsContent>
 
-        <TabsContent value="bedroom" />
-        <TabsContent value="work" className="max-h-[500px] overflow-y-auto scrollbar-hide"> 
-          <div className="grid grid-cols-3 gap-4 mt-4">
-               {workProducts.map((product) => (
-               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+        <TabsContent value="bedroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
+         <div className="grid grid-cols-3 gap-4 mt-4">
+               {bedroom.map((product) => (
+               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
                   <img
                      src={product.image_url}
                      alt={product.name}
-                     className="w-full h-40 object-cover rounded"
+                     className="max-w-full max-h-full object-contain rounded"
                   />
                   <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                   <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
@@ -157,7 +172,22 @@ export default function Furniture() {
                ))}
             </div>
         </TabsContent>
-        <TabsContent value="baby" />
+
+        <TabsContent value="work" className="max-h-[500px] overflow-y-auto scrollbar-hide"> 
+          <div className="grid grid-cols-3 gap-4 mt-4">
+               {work.map((product) => (
+               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square">
+                  <img
+                     src={product.image_url}
+                     alt={product.name}
+                     className="max-w-full max-h-full object-contain rounded"
+                  />
+                  <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                  <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+               </div>
+               ))}
+            </div>
+        </TabsContent>
       </Tabs>
     </main>
   );
