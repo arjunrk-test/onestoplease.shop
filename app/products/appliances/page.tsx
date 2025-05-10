@@ -1,8 +1,99 @@
 "use client"
 import { LuWashingMachine } from "react-icons/lu";
 import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Product {
+   id: number;
+   name: string;
+   price: number;
+   image_url: string;
+   category: string;
+   subCategory: string;
+}
 
 export default function Appliances(){
+
+   const [livingroom, setLivingRoom] = useState<Product[]>([]);
+   const [kitchen, setKitchen] = useState<Product[]>([]);
+   const [bedroom, setBedroom] = useState<Product[]>([]);
+   const [washing, setWashing] = useState<Product[]>([]);
+
+   useEffect(() => {
+      const fetchLivingRoom = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Appliances")
+            .eq("subcategory", "Livingroom");
+
+         if (error) {
+            console.error("Error fetching appliances products:", error);
+         } else {
+            setLivingRoom(data || []);
+         }
+      };
+
+      fetchLivingRoom();
+   }, []);
+
+   useEffect(() => {
+      const fetchKitchen = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Appliances")
+            .eq("subcategory", "Kicthen");
+
+         if (error) {
+            console.error("Error fetching appliances products:", error);
+         } else {
+            setKitchen(data || []);
+         }
+      };
+
+      fetchKitchen();
+   }, []);
+
+   useEffect(() => {
+      const fetchBedroom = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Appliances")
+            .eq("subcategory", "Bedroom");
+
+         if (error) {
+            console.error("Error fetching appliances products:", error);
+         } else {
+            setBedroom(data || []);
+         }
+      };
+
+      fetchBedroom();
+   }, []);
+
+   useEffect(() => {
+      const fetchWashing = async () => {
+         const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("category", "Appliances")
+            .eq("subcategory", "Washing");
+
+         if (error) {
+            console.error("Error fetching appliances products:", error);
+         } else {
+            setWashing(data || []);
+         }
+      };
+
+      fetchWashing();
+   }, []);
+
+   
+
    return (
          <main className="h-[calc(100vh-112px)] bg-gray text-foreground flex flex-col items-start p-6 px-48">
             <div className="flex items-center gap-4">
@@ -34,28 +125,68 @@ export default function Appliances(){
                </TabsList>
    
                <TabsContent value="livingroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                     
-                  </div>
-               </TabsContent>
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {livingroom.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
+               </div>
+            </TabsContent>
    
                <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                     
-                  </div>
-               </TabsContent>
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {kitchen.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
+               </div>
+            </TabsContent>
    
                <TabsContent value="bedroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                     
-                  </div>
-               </TabsContent>
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {bedroom.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
+               </div>
+            </TabsContent>
    
                <TabsContent value="washing" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                     
-                  </div>
-               </TabsContent>
+               <div className="grid grid-cols-3 gap-4 mt-4">
+                  {washing.map((product) => (
+                     <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+                        <img
+                           src={product.image_url}
+                           alt={product.name}
+                           className="w-full h-40 object-cover rounded"
+                        />
+                        <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+                        <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
+                     </div>
+                  ))}
+               </div>
+            </TabsContent>
    
             </Tabs>
          </main>
