@@ -17,6 +17,8 @@ interface Product {
    price: number;
    stock: number;
    image_url?: string;
+   subcategory: string;
+   category: string;
 }
 
 export default function EditFurniture() {
@@ -28,6 +30,11 @@ export default function EditFurniture() {
    const fileInputRef = useRef<HTMLInputElement | null>(null);
    const [products, setProducts] = useState<Product[]>([]);
    const [loading, setLoading] = useState(true);
+   const [isEditing, setIsEditing] = useState(false);
+   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+   const [previousProductData, setPreviousProductData] = useState<Product | null>(null);
+
+
 
    //Products fetching and display
    useEffect(() => {
@@ -64,10 +71,19 @@ export default function EditFurniture() {
    const [errors, setErrors] = useState<{ [key: string]: string }>({});
    const addFurniture = () => setIsDialogOpen(true);
    const editButtons = [
-      { name: "add", bgColour: "bg-green-500", tooltipValue: "Add Furniture", icon: <IoMdAdd />, executeFunction: addFurniture, },
-      { name: "delete", bgColour: "bg-red-500", tooltipValue: "Delete Furniture", icon: <MdDeleteOutline />, executeFunction: () => console.log("Delete clicked"),},
-      { name: "edit", bgColour: "bg-yellow-500", tooltipValue: "Edit details", icon: <CiEdit />, executeFunction: () => console.log("Edit clicked"), },
+      {
+         name: "add",
+         bgColour: "bg-green-500",
+         tooltipValue: "Add Furniture",
+         icon: <IoMdAdd />,
+         executeFunction: () => {
+            resetForm();
+            setIsEditing(false);
+            setIsDialogOpen(true);
+         },
+      },
    ];
+
 
    const handleChange = (field: string, value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
@@ -104,75 +120,105 @@ export default function EditFurniture() {
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-
       if (!validateForm()) return;
 
       try {
          const { name, description, category, subcategory, price, stock } = formData;
+         let imageUrl = "";
 
-         // Step 1: Clean and generate filename
-         const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-         const extension = selectedFile?.name.split('.').pop()?.toLowerCase();
-         const fileName = `${cleanName}.${extension}`;
-         
-         // Step 2: Create the storage path based on category and subcategory
-         const storagePath = `${category}/${subcategory}/${fileName}`;
+         // Determine if a new image is uploaded
+         if (selectedFile) {
+            // If editing, try to delete the old image before uploading the new one
+            if (isEditing && editingProductId && previousProductData) {
+               const oldCleanName = previousProductData.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+               const oldExtension = previousProductData.image_url?.split('.').pop()?.split('?')[0];
+               const oldImagePath = `${previousProductData.category}/${previousProductData.subcategory}/${oldCleanName}.${oldExtension}`;
 
-         // Step 3: Upload image to Supabase Storage
-         const { error: uploadError } = await supabase.storage
-            .from('products')
-            .upload(storagePath, selectedFile!, {
-               cacheControl: '3600',
-               upsert: true
-            });
+               const { error: deleteError } = await supabase.storage.from("products").remove([oldImagePath]);
+               if (deleteError) console.warn("Failed to delete old image:", deleteError.message);
+            }
 
-         if (uploadError) {
-            console.error("Image upload failed:", uploadError.message);
-            setErrors((prev) => ({ ...prev, image: "Failed to upload image." }));
-            return;
+            const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+            const extension = selectedFile.name.split(".").pop()?.toLowerCase();
+            const fileName = `${cleanName}.${extension}`;
+            const storagePath = `${category}/${subcategory}/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+               .from("products")
+               .upload(storagePath, selectedFile, {
+                  cacheControl: "3600",
+                  upsert: true,
+               });
+
+            if (uploadError) {
+               console.error("Image upload failed:", uploadError.message);
+               setErrors((prev) => ({ ...prev, image: "Failed to upload image." }));
+               return;
+            }
+
+            imageUrl = supabase.storage.from("products").getPublicUrl(storagePath).data.publicUrl;
          }
 
-         // Step 4: Get public URL of uploaded image
-         const { data: { publicUrl } } = supabase.storage
-            .from('products')
-            .getPublicUrl(storagePath);
+         if (isEditing && editingProductId) {
+            const updateData: any = {
+               name,
+               description,
+               category,
+               subcategory,
+               price: Number(price),
+               stock: Number(stock),
+            };
+            if (imageUrl) updateData.image_url = imageUrl;
 
-         // Step 5: Insert into products table
-         const { error: insertError } = await supabase
-            .from('products')
-            .insert([
-               {
-                  name,
-                  description,
-                  category,
-                  subcategory,
-                  price: Number(price),
-                  stock: Number(stock),
-                  image_url: publicUrl,
-               },
-            ]);
+            const { error: updateError } = await supabase
+               .from("products")
+               .update(updateData)
+               .eq("id", editingProductId);
 
-         if (insertError) {
-            console.error("Product insert failed:", insertError.message);
-            setErrors((prev) => ({ ...prev, submit: "Failed to add product." }));
-            return;
+            if (updateError) {
+               console.error("Update failed:", updateError.message);
+               setErrors((prev) => ({ ...prev, submit: "Failed to update product." }));
+               return;
+            }
+         } else {
+            const { error: insertError } = await supabase
+               .from("products")
+               .insert([
+                  {
+                     name,
+                     description,
+                     category,
+                     subcategory,
+                     price: Number(price),
+                     stock: Number(stock),
+                     image_url: imageUrl,
+                  },
+               ]);
+
+            if (insertError) {
+               console.error("Insert failed:", insertError.message);
+               setErrors((prev) => ({ ...prev, submit: "Failed to add product." }));
+               return;
+            }
          }
 
-         // Step 6: Refresh product list and reset form
          setIsDialogOpen(false);
          resetForm();
+         setIsEditing(false);
+         setEditingProductId(null);
 
-         // Refresh the products list
          const { data } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category', 'Furniture');
+            .from("products")
+            .select("*")
+            .eq("category", "Furniture");
+
          setProducts(data || []);
       } catch (err) {
          console.error("Unexpected error:", err);
          setErrors((prev) => ({ ...prev, submit: "An unexpected error occurred." }));
       }
    };
+
 
    return (
       <main className="h-[calc(100vh-64px)] flex flex-col overflow-hidden p-6">
@@ -223,7 +269,7 @@ export default function EditFurniture() {
             ) : (
                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {products.map((product) => (
-                     <div key={product.id} className="border border-gray rounded-lg p-4 bg-background shadow-md">
+                     <div key={product.id} className="border border-gray rounded-lg p-4 bg-background shadow-md relative group">
                         {product.image_url && (
                            <img
                               src={product.image_url}
@@ -231,13 +277,80 @@ export default function EditFurniture() {
                               className="w-full h-40 object-cover mb-4 rounded-md"
                            />
                         )}
+
                         <h3 className="text-lg font-bold text-highlight">{product.name}</h3>
                         <p className="text-sm text-foreground mt-1">{product.description}</p>
                         <div className="mt-2 text-sm text-muted">
                            ₹{product.price} • Stock: {product.stock}
                         </div>
+
+                        {/* Edit & Delete buttons */}
+                        <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <button
+                              onClick={() => {
+                                 setFormData({
+                                    name: product.name,
+                                    description: product.description,
+                                    category: "Furniture",
+                                    subcategory: product.subcategory || "",
+                                    price: product.price.toString(),
+                                    stock: product.stock.toString(),
+                                 });
+                                 setSelectedFile(null);
+                                 setIsEditing(true);
+                                 setEditingProductId(product.id);
+                                 setPreviousProductData(product); // ✅ Save for comparing old image
+                                 setIsDialogOpen(true);
+                              }}
+
+
+                              className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded"
+                           >
+                              <CiEdit className="text-lg" />
+                           </button>
+                           <button
+                              onClick={async () => {
+                                 try {
+                                    // 1. Delete image from storage
+                                    const imagePath = product.image_url
+                                       ?.split("/storage/v1/object/public/products/")[1]; // Extract path after bucket
+                                    if (imagePath) {
+                                       const { error: storageError } = await supabase.storage
+                                          .from("products")
+                                          .remove([imagePath]);
+
+                                       if (storageError) {
+                                          console.error("Image deletion failed:", storageError.message);
+                                          return;
+                                       }
+                                    }
+
+                                    // 2. Delete product from table
+                                    const { error: deleteError } = await supabase
+                                       .from("products")
+                                       .delete()
+                                       .eq("id", product.id);
+
+                                    if (deleteError) {
+                                       console.error("Product deletion failed:", deleteError.message);
+                                       return;
+                                    }
+
+                                    // 3. Remove from local state
+                                    setProducts((prev) => prev.filter((p) => p.id !== product.id));
+                                 } catch (err) {
+                                    console.error("Unexpected deletion error:", err);
+                                 }
+                              }}
+
+                              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
+                           >
+                              <MdDeleteOutline className="text-lg" />
+                           </button>
+                        </div>
                      </div>
                   ))}
+
                </div>
             )}
          </div>
