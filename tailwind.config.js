@@ -22,7 +22,7 @@ module.exports = {
       xl: '1200px',
     },
     fontFamily: {
-      primary: "var(--font-jetbrains-mono)",
+      primary: ['Satoshi', 'sans-serif'],
     },
     extend: {
       colors: {
@@ -49,5 +49,5 @@ module.exports = {
       },
     },
   },
-  plugins: [tailwindcssAnimate, require("tailwind-scrollbar-hide"),],
+  plugins: [tailwindcssAnimate, require("tailwind-scrollbar-hide")],
 };

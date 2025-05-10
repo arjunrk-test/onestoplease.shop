@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Sidebar from "@/app/admin/components/Sidebar";
 
 export default function AdminLayout({
   children,
@@ -16,51 +17,40 @@ export default function AdminLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        // If no session and not on login page, redirect to login
-        if (!session && pathname !== "/admin/login") {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session && pathname !== "/admin/login") {
+        router.push("/admin/login");
+        return;
+      }
+
+      if (session) {
+        const { data: adminData, error: adminError } = await supabase
+          .from("admins")
+          .select("email")
+          .eq("email", session.user.email)
+          .single();
+
+        if (adminError || !adminData) {
+          await supabase.auth.signOut();
           router.push("/admin/login");
           return;
         }
 
-        // If we have a session, check if user is admin
-        if (session) {
-          const { data: adminData, error: adminError } = await supabase
-            .from("admins")
-            .select("email")
-            .eq("email", session.user.email)
-            .single();
-
-          if (adminError || !adminData) {
-            await supabase.auth.signOut();
-            router.push("/admin/login");
-            return;
-          }
-
-          // If we're on the login page and user is authenticated, redirect to admin dashboard
-          if (pathname === "/admin/login") {
-            router.push("/admin");
-            return;
-          }
-
-          // User is authorized
-          setIsAuthorized(true);
+        if (pathname === "/admin/login") {
+          router.push("/admin");
+          return;
         }
-      } catch (error) {
-        console.error("Auth check error:", error);
-        router.push("/admin/login");
-      } finally {
-        setIsLoading(false);
+
+        setIsAuthorized(true);
       }
+
+      setIsLoading(false);
     };
 
     checkAuth();
   }, [router, pathname]);
 
-  // Show loading spinner while checking auth
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -69,19 +59,20 @@ export default function AdminLayout({
     );
   }
 
-  // Don't render the layout on the login page
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
 
-  // Only render admin content if authorized
   if (!isAuthorized) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {children}
+    <div className="flex h-screen bg-white">
+      <Sidebar />
+      <main className="flex-1 m-2 p-6 bg-black/80 text-white rounded-xl shadow-lg overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }
