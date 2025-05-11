@@ -10,67 +10,42 @@ interface Product {
   price: number;
   image_url: string;
   category: string;
-  subCategory: string;
+  subcategory: string;
 }
 
+const subcategories = [
+  { key: "livingroom", label: "Living Room" },
+  { key: "kitchen", label: "Kitchen & Dining" },
+  { key: "bedroom", label: "Bedroom" },
+  { key: "work", label: "Work" },
+];
+
 export default function Furniture() {
-  const [livingRoomProducts, setLivingRoomProducts] = useState<Product[]>([]);
-  const [kitchenProducts, setKitchenProducts] = useState<Product[]>( [] );
-  const [workProducts, setWorkProducts] = useState<Product[]>( [] );
+  const [products, setProducts] = useState<Record<string, Product[]>>({});
 
   useEffect(() => {
-    const fetchLivingRoomProducts = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("category", "Furniture")
-        .eq("subcategory", "Livingroom");
+    const fetchAllProducts = async () => {
+      const promises = subcategories.map(async ({ key, label }) => {
+        const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("category", "Furniture")
+          .eq("subcategory", capitalizedKey);
 
-      if (error) {
-        console.error("Error fetching furniture products:", error);
-      } else {
-        setLivingRoomProducts(data || []);
-      }
+        if (error) {
+          console.error(`Error fetching ${label} products:`, error);
+          return [key, []];
+        }
+        return [key, data || []];
+      });
+
+      const results = await Promise.all(promises);
+      setProducts(Object.fromEntries(results));
     };
 
-    fetchLivingRoomProducts();
+    fetchAllProducts();
   }, []);
-
-  useEffect(() => {
-   const fetchKitchenProducts = async () => {
-     const { data, error } = await supabase
-       .from("products")
-       .select("*")
-       .eq("category", "Furniture")
-       .eq("subcategory", "Kitchen");
-
-     if (error) {
-       console.error("Error fetching furniture products:", error);
-     } else {
-       setKitchenProducts(data || []);
-     }
-   };
-
-   fetchKitchenProducts();
- }, []);
-
- useEffect(() => {
-   const fetchWorkProducts = async () => {
-     const { data, error } = await supabase
-       .from("products")
-       .select("*")
-       .eq("category", "Furniture")
-       .eq("subcategory", "Work");
-
-     if (error) {
-       console.error("Error fetching furniture products:", error);
-     } else {
-       setWorkProducts(data || []);
-     }
-   };
-
-   fetchWorkProducts();
- }, []);
 
   return (
     <main className="h-[calc(100vh-112px)] bg-gray text-foreground flex flex-col items-start p-6 px-48">
@@ -90,74 +65,42 @@ export default function Furniture() {
       </div>
 
       <Tabs defaultValue="livingroom" className="w-full mt-8">
-        <TabsList className="grid w-full grid-cols-5 bg-highlight">
-          <TabsTrigger value="livingroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Living&nbsp;Room
-          </TabsTrigger>
-          <TabsTrigger value="kitchen" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Kitchen&nbsp;&amp;&nbsp;Dining
-          </TabsTrigger>
-          <TabsTrigger value="bedroom" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Bedroom
-          </TabsTrigger>
-          <TabsTrigger value="work" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Work
-          </TabsTrigger>
-          <TabsTrigger value="baby" className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80">
-            Baby
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-highlight">
+          {subcategories.map(({ key, label }) => (
+            <TabsTrigger
+              key={key}
+              value={key}
+              className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80"
+            >
+              {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="livingroom" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            {livingRoomProducts.map((product) => (
-              <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-40 object-cover rounded"
-                />
-                <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
-                <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Other tabs stay empty for now */}
-        <TabsContent value="kitchen" className="max-h-[500px] overflow-y-auto scrollbar-hide">
-         <div className="grid grid-cols-3 gap-4 mt-4">
-               {kitchenProducts.map((product) => (
-               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
+        {subcategories.map(({ key }) => (
+          <TabsContent
+            key={key}
+            value={key}
+            className="max-h-[500px] overflow-y-auto scrollbar-hide"
+          >
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              {(products[key] || []).map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square"
+                >
                   <img
-                     src={product.image_url}
-                     alt={product.name}
-                     className="w-full h-40 object-cover rounded"
+                    src={product.image_url}
+                    alt={product.name}
+                    className="max-w-full max-h-full object-contain rounded"
                   />
                   <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
                   <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
-               </div>
-               ))}
+                </div>
+              ))}
             </div>
-        </TabsContent>
-
-        <TabsContent value="bedroom" />
-        <TabsContent value="work" className="max-h-[500px] overflow-y-auto scrollbar-hide"> 
-          <div className="grid grid-cols-3 gap-4 mt-4">
-               {workProducts.map((product) => (
-               <div key={product.id} className="bg-white text-black/80 rounded-lg shadow p-4">
-                  <img
-                     src={product.image_url}
-                     alt={product.name}
-                     className="w-full h-40 object-cover rounded"
-                  />
-                  <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
-                  <p className="text-muted-foreground text-sm">₹{product.price} / month</p>
-               </div>
-               ))}
-            </div>
-        </TabsContent>
-        <TabsContent value="baby" />
+          </TabsContent>
+        ))}
       </Tabs>
     </main>
   );
