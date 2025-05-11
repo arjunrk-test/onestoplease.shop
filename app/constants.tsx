@@ -37,7 +37,7 @@ export const Locations = [
     {
       name: "Wishlist",
       icon: <CiHeart className="text-highlight text-2xl"/>,
-      reference: "/whishlist",
+      reference: "/wishlist",
     },
     {
       name: "Settings",

@@ -10,12 +10,14 @@ import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import ProfileDropdown from "./ProfileDropdown";
 import { IoIosCart } from "react-icons/io";
 import { useCartStore } from "@/lib/cartStore";
+import { useLoginDialog } from "@/hooks/useLoginDialog";
 
 export default function Navbar() {
   const [location, setLocation] = useState("Chennai");
   const user = useSupabaseUser();
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+  const openLogin = useLoginDialog((state) => state.open);
 
   return (
     <nav className="w-full sticky top-0 px-48 py-4 bg-gray shadow-sm flex items-center justify-between gap-6">
@@ -60,9 +62,20 @@ export default function Navbar() {
       </Link>
 
       {/* Auth Button / Profile */}
-      <div>
-        {user ? <ProfileDropdown /> : <OtpLoginDialog />}
-      </div>
+      {user ? (
+        <ProfileDropdown />
+      ) : (
+        <Button
+          onClick={() => openLogin()}
+          className="px-6 py-3 h-8 text-md text-white bg-highlight hover:bg-highlight/80"
+          variant="default"
+        >
+          Login
+        </Button>
+      )}
+
+      {/* Only one shared dialog instance at the bottom */}
+      <OtpLoginDialog />
     </nav>
   );
 }
