@@ -1,73 +1,48 @@
-// "use client";
-// import { useState } from "react";
-// import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-// import OtpLogin from "./OtpLogin";
-// import { Button } from "./ui/button";
-
-// export default function OtpLoginDialog() {
-//   const [open, setOpen] = useState(false);
-
-//   return (
-//     <Dialog open={open} onOpenChange={setOpen}>
-//       <DialogTrigger asChild>
-//         <Button variant="outline">Login</Button>
-//       </DialogTrigger>
-
-//       <DialogContent className="sm:max-w-md">
-//         <OtpLogin closeDialog={() => setOpen(false)} />
-//       </DialogContent>
-//     </Dialog>
-//   );
-// }
-
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
-   DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "./ui/button";
 import OtpLogin from "./OtpLogin";
+import { useLoginDialog } from "@/hooks/useLoginDialog";
 
 export default function OtpLoginDialog() {
-   const [open, setOpen] = useState(false);
+  const { isOpen, message, close } = useLoginDialog();
 
-   return (
-      <Dialog open={open} onOpenChange={setOpen}>
-         <DialogTrigger asChild>
-            <Button
-               variant="default"
-               className="px-6 py-3 h-8 text-md text-white bg-highlight hover:bg-highlight/80"
-            >
-               Login
-            </Button>
-         </DialogTrigger>
+  return (
+    <Dialog open={isOpen} onOpenChange={close}>
+      <DialogContent className="!w-[800px] !h-[300px] !max-w-none p-0 overflow-hidden bg-gray-200">
+        <div className="flex flex-col md:flex-row w-full">
+          {/* Left Illustration */}
+          <div className="w-full md:w-1/2 bg-highlight text-white p-4 flex flex-col justify-center">
+            <img
+              src="/login.svg"
+              alt="Login Illustration"
+              className="w-full h-auto m-2 object-contain"
+            />
+          </div>
 
-         <DialogContent className="!w-[800px] !h-[300px] !max-w-none p-0 overflow-hidden bg-gray-200" >
-            <div className="flex flex-col md:flex-row w-full">
-               {/* Left Section */}
-               <div className="w-full md:w-1/2 bg-highlight text-white p-4 flex flex-col justify-center">
-                  <div className=" flex items-center justify-center">
-                     <img
-                        src="/login.svg"
-                        alt="Login Illustration"
-                        className="w-full h-auto m-2 object-contain"
-                     />
-                  </div>
-               </div>
+          {/* Right Form */}
+          <div className="w-full md:w-1/2 bg-white p-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl mb-4 font-normal flex justify-center">
+                Login with OTP
+              </DialogTitle>
+            </DialogHeader>
 
-               {/* Right Section */}
-               <div className="w-full md:w-1/2 bg-white p-6">
-                  <DialogHeader>
-                     <DialogTitle className="text-2xl mb-4 font-normal flex justify-center">Login with OTP</DialogTitle>
-                  </DialogHeader>
-                  <OtpLogin closeDialog={() => setOpen(false)} />
-               </div>
-            </div>
-         </DialogContent>
-      </Dialog>
-   );
+            {message && (
+              <div className="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 text-sm p-3 mb-4 rounded">
+                {message}
+              </div>
+            )}
+
+            <OtpLogin closeDialog={close} />
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

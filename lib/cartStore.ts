@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface CartItem {
-  id: number;
+  id: string; // ✅ UUID as string
   name: string;
   price: number;
   image_url: string;
@@ -12,7 +12,7 @@ interface CartItem {
 interface CartState {
   items: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: number) => void;
+  removeFromCart: (id: string) => void; // ✅ string here too
   clearCart: () => void;
   hasHydrated: boolean;
   setHasHydrated: (hydrated: boolean) => void;
@@ -23,7 +23,9 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       hasHydrated: false,
+
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
+
       addToCart: (item) => {
         const exists = get().items.find((i) => i.id === item.id);
         if (exists) {
@@ -36,8 +38,12 @@ export const useCartStore = create<CartState>()(
           set({ items: [...get().items, { ...item, quantity: 1 }] });
         }
       },
+
       removeFromCart: (id) =>
-        set({ items: get().items.filter((item) => item.id !== id) }),
+        set({
+          items: get().items.filter((item) => item.id !== id),
+        }),
+
       clearCart: () => set({ items: [] }),
     }),
     {
