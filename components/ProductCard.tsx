@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useCartStore } from "@/lib/cartStore";
 import { toast } from "sonner";
@@ -20,38 +21,57 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const user = useSupabaseUser();
   const openLogin = useLoginDialog((state) => state.open);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Fetch wishlist status on mount
+  useEffect(() => {
+    const fetchWishlistStatus = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("wishlist")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("product_id", product.id)
+        .maybeSingle();
+
+      if (data) setIsWishlisted(true);
+    };
+
+    fetchWishlistStatus();
+  }, [user, product.id]);
 
   const handleWishlist = async () => {
     if (!user) {
-      openLogin("Please log in to add items to your wishlist.");
+      openLogin("Please log in to manage your wishlist.");
       return;
     }
 
-    // Pre-check for existing wishlist entry
-    const { data: existing } = await supabase
-      .from("wishlist")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("product_id", product.id)
-      .maybeSingle();
+    if (isWishlisted) {
+      const { error } = await supabase
+        .from("wishlist")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("product_id", product.id);
 
-    if (existing) {
-      toast.warning("Already in your wishlist.");
-      return;
-    }
-
-    const { error } = await supabase.from("wishlist").insert([
-      {
-        user_id: user.id,
-        product_id: product.id,
-      },
-    ]);
-
-    if (error) {
-      console.error("Supabase wishlist error:", error);
-      toast.error("Failed to add to wishlist.");
+      if (error) {
+        toast.error("Failed to remove from wishlist.");
+        console.error(error);
+      } else {
+        toast.success("Removed from wishlist.");
+        setIsWishlisted(false);
+      }
     } else {
-      toast.success("Added to wishlist.");
+      const { error } = await supabase.from("wishlist").insert([
+        { user_id: user.id, product_id: product.id },
+      ]);
+
+      if (error) {
+        toast.error("Failed to add to wishlist.");
+        console.error(error);
+      } else {
+        toast.success("Added to wishlist.");
+        setIsWishlisted(true);
+      }
     }
   };
 
@@ -129,13 +149,29 @@ export default function ProductCard({ product }: { product: Product }) {
                 onClick={handleWishlist}
                 className="bg-black/80 hover:bg-muted p-3 rounded-full shadow"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 010 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+                {isWishlisted ? (
+                  // Filled heart
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
+                    4.42 3 7.5 3c1.74 0 3.41 0.81 
+                    4.5 2.09C13.09 3.81 14.76 3 16.5 3 
+                    19.58 3 22 5.42 22 8.5c0 3.78-3.4 
+                    6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                ) : (
+                  // Outline heart
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 010 
+                      6.364L12 20.364l7.682-7.682a4.5 
+                      4.5 0 00-6.364-6.364L12 
+                      7.636l-1.318-1.318a4.5 4.5 0 
+                      00-6.364 0z" />
+                  </svg>
+                )}
               </button>
             </TooltipTrigger>
             <TooltipContent side="left" className="bg-black/80 text-white">
-              <p>Wishlist</p>
+              <p>{isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}</p>
             </TooltipContent>
           </Tooltip>
 
@@ -144,7 +180,8 @@ export default function ProductCard({ product }: { product: Product }) {
             <TooltipTrigger asChild>
               <button className="bg-black/80 hover:bg-muted p-3 rounded-full shadow">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405M19 21l-4-4m0 0a7 7 0 10-10 0 7 7 0 0010 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405M19 21l-4-4m0 0a7 7 0 
+                  10-10 0 7 7 0 0010 0z" />
                 </svg>
               </button>
             </TooltipTrigger>
