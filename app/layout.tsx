@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 import NProgressHandler from "@/components/NProgress";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "One Stop Lease",
@@ -44,6 +45,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <NProgressHandler />
+            <Toaster position="top-left" richColors />
             {children}
           </AuthProvider>
         </ThemeProvider>

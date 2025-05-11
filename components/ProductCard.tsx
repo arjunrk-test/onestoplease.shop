@@ -1,5 +1,8 @@
 "use client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useCartStore } from "@/lib/cartStore"; // ✅ Zustand cart store
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -9,6 +12,9 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const addToCart = useCartStore((state) => state.addToCart); // ✅ access store
+  const router = useRouter();
+
   return (
     <div className="group relative bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square flex flex-col items-center justify-between">
       <img
@@ -22,11 +28,50 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Hover Icon Actions */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex flex-col gap-2 transition-opacity duration-300 z-10 ">
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex flex-col gap-2 transition-opacity duration-300 z-10">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="bg-black/80 hover:bg-muted p-3 rounded-full shadow">
+              <button
+                onClick={() => {
+                  const cartItems = useCartStore.getState().items;
+                  const alreadyInCart = cartItems.some((item) => item.id === product.id);
+
+                  if (alreadyInCart) {
+                    toast.warning("Item already in cart", {
+                      description: "To increase quantity, update it in the cart page.",
+                    });
+                    return;
+                  }
+
+                  addToCart({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image_url: product.image_url,
+                    quantity: 1,
+                  });
+                  toast.custom((t) => (
+                    <div className="bg-white dark:bg-background border border-border rounded-md shadow-md p-4 flex items-center justify-between gap-4 w-full max-w-sm">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Added to cart</p>
+                        <p className="text-xs text-foreground">{product.name}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          router.push("/cart");
+                          toast.dismiss(t); // Close the toast
+                        }}
+                        className="bg-highlight hover:bg-highlight/80 text-white text-xs px-3 py-1 rounded-md"
+                      >
+                        Go to Cart
+                      </button>
+                    </div>
+                  ));
+
+                }}
+                className="bg-black/80 hover:bg-muted p-3 rounded-full shadow"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 7h13l-1.5-7M9 21h6" />
                 </svg>
