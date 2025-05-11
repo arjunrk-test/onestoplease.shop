@@ -46,12 +46,13 @@ export default function ProductGrid({ category, subcategories }: Props) {
 
   return (
     <Tabs defaultValue={subcategories[0].key} className="w-full mt-8">
-      <TabsList className={`grid w-full grid-cols-${subcategories.length} bg-highlight`}>
+
+      <TabsList className="flex w-full flex-wrap justify-start gap-2 bg-highlight  rounded-md">
         {subcategories.map(({ key, label }) => (
           <TabsTrigger
             key={key}
             value={key}
-            className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80"
+            className="px-4 py-1.5 text-sm rounded-md data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80"
           >
             {label}
           </TabsTrigger>
