@@ -51,7 +51,7 @@ export default function ProductGrid({ category, subcategories }: Props) {
           <TabsTrigger
             key={key}
             value={key}
-            className="data-[state=active]:bg-foreground data-[state=active]:text-background text-black/80"
+            className="data-[state=active]:bg-foreground data-[state=active]:text-background dark:data-[state=active]:text-background text-black/80"
           >
             {label}
           </TabsTrigger>
