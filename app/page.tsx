@@ -25,6 +25,11 @@ export default function Home() {
                   Explore Products
                 </Button>
               </Link>
+              <Link href="/contribute">
+                <Button className="px-6 py-3 text-base bg-accent hover:bg-highlight/80">
+                  Contribute & earn
+                </Button>
+              </Link>
             </div>
           </div>
 
