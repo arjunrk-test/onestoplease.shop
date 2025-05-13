@@ -14,7 +14,7 @@ import { useLoginDialog } from "@/hooks/useLoginDialog";
 
 export default function Navbar() {
   const [location, setLocation] = useState("Chennai");
-  const user = useSupabaseUser();
+  const {user} = useSupabaseUser();
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const openLogin = useLoginDialog((state) => state.open);

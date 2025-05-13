@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface Product {
-   id: string; // ✅ UUID
+   id: string; 
    name: string;
    price: number;
    image_url: string;
 }
 
 export default function WishlistPage() {
-   const user = useSupabaseUser();
+   const { user } = useSupabaseUser();
    const router = useRouter();
    const [wishlist, setWishlist] = useState<Product[]>([]);
    const [loading, setLoading] = useState(true);

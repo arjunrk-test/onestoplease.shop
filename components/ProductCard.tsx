@@ -19,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const router = useRouter();
 
-  const user = useSupabaseUser();
+  const {user} = useSupabaseUser();
   const openLogin = useLoginDialog((state) => state.open);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
