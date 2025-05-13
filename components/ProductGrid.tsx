@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/lib/supabaseClient";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image_url: string;
