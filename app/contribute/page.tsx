@@ -14,8 +14,9 @@ import SingleFileUpload from "@/components/SingleFileUpload";
 import FormInput from "./FormInput";
 import FormTextarea from "./FormTextArea";
 import FormSelect from "./FormSelect";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 type ContributeForm = {
   fullName: string;
@@ -30,7 +31,7 @@ type ContributeForm = {
   isWarrantyCovered: boolean;
   warrantyStart: string;
   warrantyEnd: string;
-  ownershipType: string;
+  contributionType: string;
   images: File[];
   bill: File | null;
 };
@@ -40,7 +41,9 @@ export default function Contribute() {
   const openLogin = useLoginDialog((state) => state.open);
   const [hydrated, setHydrated] = useState(false);
   const [pincodeWarning, setPincodeWarning] = useState("");
-  const [locationLinkWarning, setLocationLinkWarning] = useState(""); // 🆕 warning state
+  const [locationLinkWarning, setLocationLinkWarning] = useState(""); 
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
 
   const [form, setForm] = useState<ContributeForm>({
     fullName: "",
@@ -55,7 +58,7 @@ export default function Contribute() {
     isWarrantyCovered: false,
     warrantyStart: "",
     warrantyEnd: "",
-    ownershipType: "",
+    contributionType: "",
     images: [],
     bill: null,
   });
@@ -112,114 +115,116 @@ export default function Contribute() {
     handleInputChange({ target: { name: "pincode", value: filtered } });
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault();
 
-  const link = form.locationLink.trim();
-  const isValid =
-    link.startsWith("https://maps.app.goo.gl/") ||
-    link.startsWith("https://www.google.com/maps") ||
-    link.startsWith("https://maps.apple.com");
+    const link = form.locationLink.trim();
+    const isValid =
+      link.startsWith("https://maps.app.goo.gl/") ||
+      link.startsWith("https://www.google.com/maps") ||
+      link.startsWith("https://maps.apple.com");
 
-  if (!isValid) {
-    setLocationLinkWarning("Please enter a valid Google Maps or Apple Maps link.");
-    return;
-  }
-
-  try {
-    if (!user) throw new Error("User not authenticated");
-
-    // Upload product images to 'contributor-product-images'
-    const imageUrls: string[] = [];
-    for (let i = 0; i < form.images.length; i++) {
-      const file = form.images[i];
-      const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
-      const filename = `${cleanedProductName}${i + 1}.${file.name.split(".").pop()}`;
-      const path = `${form.phone}/${cleanedProductName}/${filename}`;
-
-      const { error: imageError } = await supabase.storage
-        .from("contributor-product-images")
-        .upload(path, file, { upsert: true });
-
-      if (imageError) throw imageError;
-
-      const { data: imageUrlData } = supabase.storage
-        .from("contributor-product-images")
-        .getPublicUrl(path);
-
-      imageUrls.push(imageUrlData.publicUrl);
+    if (!isValid) {
+      setLocationLinkWarning("Please enter a valid Google Maps or Apple Maps link.");
+      return;
     }
 
-    let billUrl = "";
-    if (form.bill) {
-      const extension = form.bill.name.split(".").pop();
-      const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
-      const filename = `${cleanedProductName}_bill.${extension}`;
-      const billPath = `${form.phone}/${cleanedProductName}/${filename}`;
-      const { error: billError } = await supabase.storage
-        .from("contributor-product-bill")
-        .upload(billPath, form.bill, { upsert: true });
+    try {
+      if (!user) throw new Error("User not authenticated");
 
-      if (billError) throw billError;
+      // Upload product images to 'contributor-product-images'
+      const imageUrls: string[] = [];
+      for (let i = 0; i < form.images.length; i++) {
+        const file = form.images[i];
+        const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
+        const filename = `${cleanedProductName}${i + 1}.${file.name.split(".").pop()}`;
+        const path = `${form.phone}/${cleanedProductName}/${filename}`;
 
-      const { data: billUrlData } = supabase.storage
-        .from("contributor-product-bill")
-        .getPublicUrl(billPath);
+        const { error: imageError } = await supabase.storage
+          .from("contributor-product-images")
+          .upload(path, file, { upsert: true });
 
-      billUrl = billUrlData.publicUrl;
+        if (imageError) throw imageError;
+
+        const { data: imageUrlData } = supabase.storage
+          .from("contributor-product-images")
+          .getPublicUrl(path);
+
+        imageUrls.push(imageUrlData.publicUrl);
+      }
+
+      let billUrl = "";
+      if (form.bill) {
+        const extension = form.bill.name.split(".").pop();
+        const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
+        const filename = `${cleanedProductName}_bill.${extension}`;
+        const billPath = `${form.phone}/${cleanedProductName}/${filename}`;
+        const { error: billError } = await supabase.storage
+          .from("contributor-product-bill")
+          .upload(billPath, form.bill, { upsert: true });
+
+        if (billError) throw billError;
+
+        const { data: billUrlData } = supabase.storage
+          .from("contributor-product-bill")
+          .getPublicUrl(billPath);
+
+        billUrl = billUrlData.publicUrl;
+      }
+
+      const { error: dbError } = await supabase.from("contributions").insert({
+        user_id: user.id,
+        full_name: form.fullName,
+        phone_number: form.phone,
+        additional_phone: form.additionalPhone,
+        address: form.address,
+        landmark: form.landmark,
+        location_link: form.locationLink,
+        pincode: form.pincode,
+        product_name: form.productName,
+        description: form.description,
+        contribution_type: form.contributionType,
+        warranty_covered: form.isWarrantyCovered,
+        warranty_start: form.isWarrantyCovered ? form.warrantyStart : null,
+        warranty_end: form.isWarrantyCovered ? form.warrantyEnd : null,
+        image_urls: imageUrls,
+        bill_url: billUrl,
+      });
+
+      if (dbError) throw dbError;
+
+      // Success
+      toast.success("Contribution submitted successfully!");
+
+      // Clear the form
+      setForm({
+        fullName: "",
+        phone: user.phone || "",
+        additionalPhone: "",
+        address: "",
+        locationLink: "",
+        landmark: "",
+        pincode: "",
+        productName: "",
+        description: "",
+        isWarrantyCovered: false,
+        warrantyStart: "",
+        warrantyEnd: "",
+        contributionType: "",
+        images: [],
+        bill: null,
+      });
+      setLocationLinkWarning("");
+      setPincodeWarning("");
+    } catch (error: any) {
+      console.error("Submission failed:", error.message);
+      toast.error("Submission failed. Please try again.");
     }
-
-    const { error: dbError } = await supabase.from("contributions").insert({
-      user_id: user.id,
-      full_name: form.fullName,
-      phone_number: form.phone,
-      additional_phone: form.additionalPhone,
-      address: form.address,
-      landmark: form.landmark,
-      location_link: form.locationLink,
-      pincode: form.pincode,
-      product_name: form.productName,
-      description: form.description,
-      contribution_type: form.ownershipType,
-      warranty_covered: form.isWarrantyCovered,
-      warranty_start: form.isWarrantyCovered ? form.warrantyStart : null,
-      warranty_end: form.isWarrantyCovered ? form.warrantyEnd : null,
-      image_urls: imageUrls,
-      bill_url: billUrl,
-    });
-
-    if (dbError) throw dbError;
-
-    // Success
-    toast.success("Contribution submitted successfully!");
-
-    // Clear the form
-    setForm({
-      fullName: "",
-      phone: user.phone || "",
-      additionalPhone: "",
-      address: "",
-      locationLink: "",
-      landmark: "",
-      pincode: "",
-      productName: "",
-      description: "",
-      isWarrantyCovered: false,
-      warrantyStart: "",
-      warrantyEnd: "",
-      ownershipType: "",
-      images: [],
-      bill: null,
-    });
-    setLocationLinkWarning("");
-    setPincodeWarning("");
-  } catch (error: any) {
-    console.error("Submission failed:", error.message);
-    toast.error("Submission failed. Please try again.");
-  }
-};
+  };
+  const router = useRouter();
 
   return (
+
     <>
       <Navbar />
       <main className="min-h-[calc(100vh-112px)] p-6 bg-background text-foreground h-screen">
@@ -235,8 +240,20 @@ export default function Contribute() {
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold mb-4 text-highlight">Contribute & Earn</h1>
-            <p className="mb-6">You can now contribute your products for rent or resale.</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold text-highlight">Contribute & Earn</h1>
+                <p className="">You can now contribute your products for rent or resale.</p>
+              </div>
+
+              <Button
+                variant="default"
+                className="text-sm text-black bg-highlight"
+                onClick={() => router.push("/contribute/view-contributions")}
+              >
+                View Your Contributions
+              </Button>
+            </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-foreground text-background p-6 rounded-md">
               {/* Left Column */}
@@ -269,7 +286,7 @@ export default function Contribute() {
                     { label: "Sell to OneStopLease", value: "sell" },
                     { label: "Rent out through OneStopLease", value: "rent" },
                   ]}
-                  onChange={(val) => setForm((prev) => ({ ...prev, ownershipType: val }))}
+                  onChange={(val) => setForm((prev) => ({ ...prev, contributionType: val }))}
                 />
 
                 <FormSelect
@@ -310,13 +327,71 @@ export default function Contribute() {
               </div>
 
               <div className="md:col-span-2 text-center">
-                <Button type="submit" className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80">
+                <Button
+                  type="button"
+                  className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80"
+                  onClick={() => {
+                    const requiredFields = [
+                      form.fullName,
+                      form.phone,
+                      form.address,
+                      form.pincode,
+                      form.productName,
+                      form.contributionType,
+                      form.locationLink,
+                      form.images.length > 0,
+                      form.bill,
+                      form.isWarrantyCovered ? form.warrantyStart && form.warrantyEnd : true,
+                    ];
+
+                    const allFilled = requiredFields.every(Boolean);
+
+                    if (!allFilled) {
+                      toast.error("Please fill out all required fields.");
+                      return;
+                    }
+
+                    setShowConfirmDialog(true);
+                  }}
+                >
                   Submit Contribution
                 </Button>
+
               </div>
             </form>
           </>
         )}
+        {showConfirmDialog && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h3 className="text-lg font-semibold mb-4 text-highlight">
+                Confirm Submission
+              </h3>
+              <p className="text-sm text-muted mb-6">
+                You cannot edit the product once added. Please make sure all the details are entered correctly.
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="default"
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                  onClick={() => setShowConfirmDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-green-500 hover:bg-green-600 text-black"
+                  onClick={(e) => {
+                    setShowConfirmDialog(false);
+                    handleSubmit(e); // manually invoke form submit
+                  }}
+                >
+                  Yes, Submit
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
     </>
   );
