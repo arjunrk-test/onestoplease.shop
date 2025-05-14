@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { useLoginDialog } from "@/hooks/useLoginDialog";
 import OtpLoginDialog from "@/components/OtpLoginDialog";
@@ -14,6 +14,8 @@ import SingleFileUpload from "@/components/SingleFileUpload";
 import FormInput from "./FormInput";
 import FormTextarea from "./FormTextArea";
 import FormSelect from "./FormSelect";
+import { toast } from "sonner"; 
+import { supabase } from "@/lib/supabaseClient";
 
 type ContributeForm = {
   fullName: string;
@@ -110,22 +112,112 @@ export default function Contribute() {
     handleInputChange({ target: { name: "pincode", value: filtered } });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const link = form.locationLink.trim();
-    const isValid =
-      link.startsWith("https://maps.app.goo.gl/") ||
-      link.startsWith("https://www.google.com/maps") ||
-      link.startsWith("https://maps.apple.com");
+  const link = form.locationLink.trim();
+  const isValid =
+    link.startsWith("https://maps.app.goo.gl/") ||
+    link.startsWith("https://www.google.com/maps") ||
+    link.startsWith("https://maps.apple.com");
 
-    if (!isValid) {
-      setLocationLinkWarning("Please enter a valid Google Maps or Apple Maps link.");
-      return;
+  if (!isValid) {
+    setLocationLinkWarning("Please enter a valid Google Maps or Apple Maps link.");
+    return;
+  }
+
+  try {
+    if (!user) throw new Error("User not authenticated");
+
+    // Upload product images to 'contributor-product-images'
+    const imageUrls: string[] = [];
+    for (let i = 0; i < form.images.length; i++) {
+      const file = form.images[i];
+      const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
+      const filename = `${cleanedProductName}${i + 1}.${file.name.split(".").pop()}`;
+      const path = `${form.phone}/${cleanedProductName}/${filename}`;
+
+      const { error: imageError } = await supabase.storage
+        .from("contributor-product-images")
+        .upload(path, file, { upsert: true });
+
+      if (imageError) throw imageError;
+
+      const { data: imageUrlData } = supabase.storage
+        .from("contributor-product-images")
+        .getPublicUrl(path);
+
+      imageUrls.push(imageUrlData.publicUrl);
     }
 
-    console.log("Submitting form:", form);
-  };
+    let billUrl = "";
+    if (form.bill) {
+      const extension = form.bill.name.split(".").pop();
+      const cleanedProductName = form.productName.replace(/\s+/g, "").toLowerCase();
+      const filename = `${cleanedProductName}_bill.${extension}`;
+      const billPath = `${form.phone}/${cleanedProductName}/${filename}`;
+      const { error: billError } = await supabase.storage
+        .from("contributor-product-bill")
+        .upload(billPath, form.bill, { upsert: true });
+
+      if (billError) throw billError;
+
+      const { data: billUrlData } = supabase.storage
+        .from("contributor-product-bill")
+        .getPublicUrl(billPath);
+
+      billUrl = billUrlData.publicUrl;
+    }
+
+    const { error: dbError } = await supabase.from("contributions").insert({
+      user_id: user.id,
+      full_name: form.fullName,
+      phone_number: form.phone,
+      additional_phone: form.additionalPhone,
+      address: form.address,
+      landmark: form.landmark,
+      location_link: form.locationLink,
+      pincode: form.pincode,
+      product_name: form.productName,
+      description: form.description,
+      contribution_type: form.ownershipType,
+      warranty_covered: form.isWarrantyCovered,
+      warranty_start: form.isWarrantyCovered ? form.warrantyStart : null,
+      warranty_end: form.isWarrantyCovered ? form.warrantyEnd : null,
+      image_urls: imageUrls,
+      bill_url: billUrl,
+    });
+
+    if (dbError) throw dbError;
+
+    // Success
+    toast.success("Contribution submitted successfully!");
+
+    // Clear the form
+    setForm({
+      fullName: "",
+      phone: user.phone || "",
+      additionalPhone: "",
+      address: "",
+      locationLink: "",
+      landmark: "",
+      pincode: "",
+      productName: "",
+      description: "",
+      isWarrantyCovered: false,
+      warrantyStart: "",
+      warrantyEnd: "",
+      ownershipType: "",
+      images: [],
+      bill: null,
+    });
+    setLocationLinkWarning("");
+    setPincodeWarning("");
+  } catch (error: any) {
+    console.error("Submission failed:", error.message);
+    toast.error("Submission failed. Please try again.");
+  }
+};
 
   return (
     <>
