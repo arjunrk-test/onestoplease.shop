@@ -6,13 +6,13 @@ import { User } from "@supabase/supabase-js";
 
 export function useSupabaseUser() {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+      setIsAuthReady(true);
     };
 
     getUser();
@@ -26,5 +26,5 @@ export function useSupabaseUser() {
     };
   }, []);
 
-  return user;
+  return { user, isAuthReady };
 }
