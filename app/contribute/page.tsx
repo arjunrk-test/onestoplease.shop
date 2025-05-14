@@ -20,6 +20,7 @@ type ContributeForm = {
   phone: string;
   additionalPhone: string;
   address: string;
+  locationLink: string;
   landmark: string;
   pincode: string;
   productName: string;
@@ -33,17 +34,18 @@ type ContributeForm = {
 };
 
 export default function Contribute() {
-const { user, isAuthReady } = useSupabaseUser();
+  const { user, isAuthReady } = useSupabaseUser();
   const openLogin = useLoginDialog((state) => state.open);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [pincodeWarning, setPincodeWarning] = useState("");
+  const [locationLinkWarning, setLocationLinkWarning] = useState(""); // 🆕 warning state
 
   const [form, setForm] = useState<ContributeForm>({
     fullName: "",
     phone: "",
     additionalPhone: "",
     address: "",
+    locationLink: "",
     landmark: "",
     pincode: "",
     productName: "",
@@ -62,19 +64,29 @@ const { user, isAuthReady } = useSupabaseUser();
   }, []);
 
   useEffect(() => {
-  if (!hydrated || !isAuthReady) return; 
-
-  if (!user) {
-    openLogin("Please login to contribute your products.");
-  } else {
-    setForm((prev) => ({ ...prev, phone: user.phone || "" }));
-  }
-}, [hydrated, isAuthReady, user, openLogin]);
-
-
+    if (!hydrated || !isAuthReady) return;
+    if (!user) openLogin("Please login to contribute your products.");
+    else setForm((prev) => ({ ...prev, phone: user.phone || "" }));
+  }, [hydrated, isAuthReady, user, openLogin]);
 
   const handleInputChange = (e: any) => {
     const { name, value, files } = e.target;
+
+    if (name === "locationLink") {
+      const trimmed = value.trim();
+      const isValid =
+        trimmed.startsWith("https://maps.app.goo.gl/") ||
+        trimmed.startsWith("https://www.google.com/maps") ||
+        trimmed.startsWith("https://maps.apple.com");
+
+      setLocationLinkWarning(
+        isValid ? "" : "Please enter a valid Google Maps or Apple Maps link."
+      );
+
+      setForm((prev) => ({ ...prev, locationLink: trimmed }));
+      return;
+    }
+
     if (files) {
       setForm((prev) => ({
         ...prev,
@@ -100,6 +112,18 @@ const { user, isAuthReady } = useSupabaseUser();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const link = form.locationLink.trim();
+    const isValid =
+      link.startsWith("https://maps.app.goo.gl/") ||
+      link.startsWith("https://www.google.com/maps") ||
+      link.startsWith("https://maps.apple.com");
+
+    if (!isValid) {
+      setLocationLinkWarning("Please enter a valid Google Maps or Apple Maps link.");
+      return;
+    }
+
     console.log("Submitting form:", form);
   };
 
@@ -130,6 +154,10 @@ const { user, isAuthReady } = useSupabaseUser();
                 <FormInput label="Additional Phone Number (Optional)" name="additionalPhone" value={form.additionalPhone} onChange={handleInputChange} />
                 <FormTextarea label="Address" name="address" value={form.address} onChange={handleInputChange} required maxLength={150} />
                 <FormInput label="Nearby Landmark (Optional)" name="landmark" value={form.landmark} onChange={handleInputChange} />
+                <FormInput label="Location link (google maps or apple maps)" name="locationLink" value={form.locationLink} required onChange={handleInputChange} />
+                {locationLinkWarning && (
+                  <p className="text-sm text-red-500 mt-1">{locationLinkWarning}</p>
+                )}
                 <div>
                   <Label className="mb-1 text-highlight">Pincode<span className="text-red-500"> *</span></Label>
                   <Input name="pincode" value={form.pincode} onChange={handlePincodeChange} className="border bg-grayInverted placeholder:text-gray" placeholder="Enter your pincode" required />
@@ -174,8 +202,6 @@ const { user, isAuthReady } = useSupabaseUser();
                   </>
                 )}
 
-                {/* Image Upload */}
-
                 <ImageUploadGroup
                   productName={form.productName}
                   images={form.images}
@@ -189,7 +215,6 @@ const { user, isAuthReady } = useSupabaseUser();
                   productName={form.productName}
                   required
                 />
-
               </div>
 
               <div className="md:col-span-2 text-center">
