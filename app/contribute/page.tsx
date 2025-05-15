@@ -227,7 +227,7 @@ export default function Contribute() {
 
     <>
       <Navbar />
-      <main className="min-h-[calc(100vh-112px)] p-6 bg-background text-foreground h-screen">
+      <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
         <OtpLoginDialog />
 
         {!hydrated ? (
