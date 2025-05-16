@@ -191,12 +191,12 @@ export default function PendingContributionsPage() {
                                     }}
                                     defaultValue={item.assigned_to}
                                  >
-                                    <SelectTrigger className="w-[160px] h-8">
+                                    <SelectTrigger className="w-[160px] h-8 bg-background text-foreground">
                                        <SelectValue placeholder="Select Agent" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="bg-background text-foreground">
                                        {agents.map((agent) => (
-                                          <SelectItem key={agent.name} value={agent.name}>
+                                          <SelectItem className="focus:bg-highlight" key={agent.name} value={agent.name}>
                                              {agent.name}
                                           </SelectItem>
                                        ))}

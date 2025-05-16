@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FaDotCircle } from "react-icons/fa";
+import { toast } from "sonner";
 
 interface Contribution {
    id: string;
@@ -35,33 +36,34 @@ export default function RejectedContributionsPage() {
    const [page, setPage] = useState(1);
    const [totalItems, setTotalItems] = useState(0);
    const [selectedContribution, setSelectedContribution] = useState<Contribution | null>(null);
+   const [revokeTarget, setRevokeTarget] = useState<Contribution | null>(null);
 
    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
    const fetchContributions = async (pageNum: number) => {
-   setLoading(true);
+      setLoading(true);
 
-   const from = (pageNum - 1) * ITEMS_PER_PAGE;
-   const to = from + ITEMS_PER_PAGE - 1;
+      const from = (pageNum - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
 
-   const { data, error } = await supabase
-      .from("contributions")
-      .select(
-         "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, image_urls, bill_url, rejection_reason",
-         { count: "exact" }
-      )
-      .eq("status", "rejected") 
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      const { data, error } = await supabase
+         .from("contributions")
+         .select(
+            "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, image_urls, bill_url, rejection_reason",
+            { count: "exact" }
+         )
+         .eq("status", "rejected")
+         .order("created_at", { ascending: false })
+         .range(from, to);
 
-   if (error) {
-      console.error("Error fetching contributions:", error.message);
-   } else {
-      setContributions(data || []);
-   }
+      if (error) {
+         console.error("Error fetching contributions:", error.message);
+      } else {
+         setContributions(data || []);
+      }
 
-   setLoading(false);
-};
+      setLoading(false);
+   };
 
 
    const fetchTotalCount = async () => {
@@ -83,8 +85,8 @@ export default function RejectedContributionsPage() {
    }, []);
 
    useEffect(() => {
-   fetchContributions(page);
-}, [page]);
+      fetchContributions(page);
+   }, [page]);
 
 
    return (
@@ -132,6 +134,7 @@ export default function RejectedContributionsPage() {
                         <TableHead>Product Name</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Phone Number</TableHead>
+                        <TableHead>Actions</TableHead>
                      </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -154,6 +157,21 @@ export default function RejectedContributionsPage() {
                               </div>
                            </TableCell>
                            <TableCell>{"+" + item.phone_number}</TableCell>
+                           <TableCell>
+                              <Button
+                                 size="sm"
+                                 className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                                 onClick={(e) => {
+                                    e.stopPropagation();
+                                    setRevokeTarget(item);
+                                 }}
+                              >
+                                 Revoke
+                              </Button>
+                           </TableCell>
+
+
+
                         </TableRow>
                      ))}
                   </TableBody>
@@ -310,6 +328,49 @@ export default function RejectedContributionsPage() {
                )}
             </DialogContent>
          </Dialog>
+         {revokeTarget && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+                  <h3 className="text-lg font-semibold mb-4 text-highlight">
+                     Revoke "{revokeTarget.product_name}"?
+                  </h3>
+                  <p className="text-sm text-muted mb-4">
+                     This will change the status to <strong>pending</strong> and remove the rejection reason.
+                  </p>
+                  <div className="flex justify-end gap-3">
+                     <Button variant="outline" onClick={() => setRevokeTarget(null)}>
+                        Cancel
+                     </Button>
+                     <Button
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        onClick={async () => {
+                           const { error } = await supabase
+                              .from("contributions")
+                              .update({
+                                 status: "pending",
+                                 assigned_to: null,
+                                 rejection_reason: null
+                              })
+                              .eq("id", revokeTarget.id);
+
+                           if (error) {
+                              toast.error("Failed to revoke.");
+                              console.error("Revoke failed:", error.message);
+                           } else {
+                              toast.success("Contribution status set to pending.");
+                              fetchContributions(page);
+                           }
+
+                           setRevokeTarget(null);
+                        }}
+                     >
+                        Yes, Revoke
+                     </Button>
+                  </div>
+               </div>
+            </div>
+         )}
+
       </div>
    );
 }
