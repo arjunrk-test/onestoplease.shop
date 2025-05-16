@@ -83,10 +83,21 @@ export const SideBarLinks = [
     ],
   },
   {
+    name: "Contributions",
+    path: "/admin/contributions",
+    icons: ClipboardList,
+    submenu: [
+      { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
+      { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
+      { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
+    ],
+  },
+  {
     name: "orders",
     path: "/admin/orders",
     icons: ClipboardList,
-  }
+  },
+  
 ];
 
 
