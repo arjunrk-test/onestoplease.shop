@@ -34,6 +34,7 @@ type Contribution = {
    contribution_type: string;
    landmark: string;
    phone_number: string;
+   rejection_reason: string;
 };
 
 export default function ViewContributions() {
@@ -119,7 +120,6 @@ export default function ViewContributions() {
                </div>
             ) : (
                <>
-
                   <div className="flex items-center justify-between mb-4">
                      <div>
                         <h2 className="text-xl font-semibold mb-1 text-highlight">Your Contributions</h2>
@@ -134,7 +134,6 @@ export default function ViewContributions() {
                         Go back
                      </Button>
                   </div>
-
 
                   <div className="space-y-4">
                      {contributions.map((item) => {
@@ -165,6 +164,7 @@ export default function ViewContributions() {
                               >
                                  <div>
                                     <h3 className="font-semibold text-xl text-highlight capitalize">{item.product_name}</h3>
+
                                     <p className="text-sm flex items-center gap-2">
                                        <FaDotCircle
                                           className={
@@ -178,7 +178,13 @@ export default function ViewContributions() {
                                        <span className="capitalize">{item.status}</span>
                                     </p>
 
+                                    {item.status === "rejected" && item.rejection_reason && (
+                                       <p className="text-sm text-red-500 mt-1">
+                                          <strong>Reason:</strong> {item.rejection_reason}
+                                       </p>
+                                    )}
                                  </div>
+
                                  <div className="flex gap-2">
                                     <Button
                                        variant="default"

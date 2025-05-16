@@ -138,7 +138,7 @@ const Sidebar: React.FC = () => {
                               }`}
                           >
                             <span className="flex items-center gap-2 capitalize">
-                              <SubIcon className="text-[18px] text-yellow-500 group-hover:text-white" />
+                              <SubIcon className="text-md text-white group-hover:text-black" />
                               {subLink.name}
                             </span>
                           </div>
