@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FaDotCircle } from "react-icons/fa";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Contribution {
    id: string;
@@ -25,44 +26,50 @@ interface Contribution {
    image_urls: string[];
    bill_url: string;
    rejection_reason: string;
+   assigned_to: string;
 }
 
 const ITEMS_PER_PAGE = 30;
 
-export default function ApprovedContributionsPage() {
+export default function PendingContributionsPage() {
    const [contributions, setContributions] = useState<Contribution[]>([]);
    const [loading, setLoading] = useState(true);
    const [page, setPage] = useState(1);
    const [totalItems, setTotalItems] = useState(0);
    const [selectedContribution, setSelectedContribution] = useState<Contribution | null>(null);
-
    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+   const [agents, setAgents] = useState<{ name: string }[]>([]);
+   const [editingRowId, setEditingRowId] = useState<string | null>(null);
+
 
    const fetchContributions = async (pageNum: number) => {
-   setLoading(true);
+      setLoading(true);
 
-   const from = (pageNum - 1) * ITEMS_PER_PAGE;
-   const to = from + ITEMS_PER_PAGE - 1;
+      const from = (pageNum - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
 
-   const { data, error } = await supabase
-      .from("contributions")
-      .select(
-         "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, image_urls, bill_url, rejection_reason",
-         { count: "exact" }
-      )
-      .eq("status", "approved") 
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      const { data, error } = await supabase
+         .from("contributions")
+         .select(
+            "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, image_urls, bill_url, rejection_reason, assigned_to",
+            { count: "exact" }
+         )
+         .eq("status", "pending")
+         .order("created_at", { ascending: false })
+         .range(from, to);
 
-   if (error) {
-      console.error("Error fetching contributions:", error.message);
-   } else {
-      setContributions(data || []);
-   }
+      if (error) {
+         console.error("Error fetching contributions:", error.message);
+      } else {
+         setContributions(data || []);
+      }
 
-   setLoading(false);
-};
+      setLoading(false);
+   };
 
+   const handleRowClick = async (contribution: Contribution) => {
+      setSelectedContribution(contribution);
+   };
 
    const fetchTotalCount = async () => {
       const { count, error } = await supabase
@@ -74,23 +81,43 @@ export default function ApprovedContributionsPage() {
       }
    };
 
-   const handleRowClick = async (contribution: Contribution) => {
-      setSelectedContribution(contribution);
+   const fetchAgents = async () => {
+      const { data, error } = await supabase
+         .from("service_agents")
+         .select("name");
+
+      if (!error) setAgents(data || []);
+   };
+
+   const assignAgent = async (contributionId: string, agentName: string) => {
+      const { error } = await supabase
+         .from("contributions")
+         .update({ assigned_to: agentName })
+         .eq("id", contributionId);
+
+      if (!error) {
+         setContributions((prev) =>
+            prev.map((c) => (c.id === contributionId ? { ...c, assigned_to: agentName } : c))
+         );
+      } else {
+         console.error("Error assigning agent:", error.message);
+      }
    };
 
    useEffect(() => {
       fetchTotalCount();
+      fetchAgents();
    }, []);
 
    useEffect(() => {
-   fetchContributions(page);
-}, [page]);
+      fetchContributions(page);
+   }, [page]);
 
    return (
       <div className="p-4">
          {/* Header */}
          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-highlight">Approved Contributions</h1>
+            <h1 className="text-2xl font-bold text-highlight">Pending Contributions</h1>
 
             {totalPages > 1 && (
                <div className="flex items-center gap-4">
@@ -131,6 +158,8 @@ export default function ApprovedContributionsPage() {
                         <TableHead>Product Name</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Phone Number</TableHead>
+                        <TableHead>Assigned To</TableHead>
+
                      </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -153,6 +182,44 @@ export default function ApprovedContributionsPage() {
                               </div>
                            </TableCell>
                            <TableCell>{"+" + item.phone_number}</TableCell>
+                           <TableCell>
+                              {editingRowId === item.id ? (
+                                 <Select
+                                    onValueChange={(val) => {
+                                       assignAgent(item.id, val);
+                                       setEditingRowId(null); // close dropdown
+                                    }}
+                                    defaultValue={item.assigned_to}
+                                 >
+                                    <SelectTrigger className="w-[160px] h-8">
+                                       <SelectValue placeholder="Select Agent" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                       {agents.map((agent) => (
+                                          <SelectItem key={agent.name} value={agent.name}>
+                                             {agent.name}
+                                          </SelectItem>
+                                       ))}
+                                    </SelectContent>
+                                 </Select>
+                              ) : (
+                                 <div className="flex items-center gap-2">
+                                    <span className="text-green-600">
+                                       {item.assigned_to || "Unassigned"}
+                                    </span>
+                                    <button
+                                       onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingRowId(item.id);
+                                       }}
+                                       className="text-sm text-blue-500 underline hover:text-blue-600"
+                                    >
+                                       Edit
+                                    </button>
+                                 </div>
+                              )}
+                           </TableCell>
+
                         </TableRow>
                      ))}
                   </TableBody>

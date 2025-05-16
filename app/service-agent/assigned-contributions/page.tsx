@@ -32,52 +32,75 @@ export default function AssignedContributionsPage() {
 
 
    const fetchAssignedContributions = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    setLoading(false);
+    return;
+  }
 
-      if (!user) {
-         setLoading(false);
-         return;
-      }
+  const { data: agent, error: agentError } = await supabase
+    .from("service_agents")
+    .select("name")
+    .eq("email", user.email)
+    .single();
 
-      const { data, error } = await supabase
-         .from("contributions")
-         .select("*")
-         .eq("assigned_to", user.id)
-         .eq("status", "pending")
-         .order("created_at", { ascending: false });
+  if (agentError || !agent) {
+    console.error("Agent not found");
+    setLoading(false);
+    return;
+  }
 
-      if (error) {
-         console.error("Error fetching assigned contributions:", error.message);
-      } else {
-         setContributions(data || []);
-      }
+  const { data, error } = await supabase
+    .from("contributions")
+    .select("*")
+    .eq("assigned_to", agent.name)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
 
-      setLoading(false);
-   };
+  if (error) {
+    console.error("Error fetching assigned contributions:", error.message);
+  } else {
+    setContributions(data || []);
+  }
 
-   const handleUnassign = async (contributionId: string) => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-         console.error("Not authenticated");
-         return;
-      }
+  setLoading(false);
+};
 
-      const { error } = await supabase
-         .from("contributions")
-         .update({ assigned_to: null })
-         .eq("id", contributionId)
-         .eq("assigned_to", user.id);
+const handleUnassign = async (contributionId: string) => {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    console.error("Not authenticated");
+    return;
+  }
 
-      if (error) {
-         console.error("Failed to unassign:", error.message);
-      } else {
-         fetchAssignedContributions();
-      }
-   };
+  const { data: agent, error: agentError } = await supabase
+    .from("service_agents")
+    .select("name")
+    .eq("email", user.email)
+    .single();
 
-   useEffect(() => {
-      fetchAssignedContributions();
-   }, []);
+  if (agentError || !agent) {
+    console.error("Agent not found");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("contributions")
+    .update({ assigned_to: null })
+    .eq("id", contributionId)
+    .eq("assigned_to", agent.name);
+
+  if (error) {
+    console.error("Failed to unassign:", error.message);
+  } else {
+    fetchAssignedContributions();
+  }
+};
+
+useEffect(() => {
+  fetchAssignedContributions();
+}, []);
+
 
    return (
       <div>

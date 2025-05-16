@@ -42,27 +42,38 @@ export default function UnassignedContributionsPage() {
    };
 
    const handleAssignToMe = async (contributionId: string) => {
-      const {
-         data: { user },
-         error: userError,
-      } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-         console.error("User not authenticated");
-         return;
-      }
+  if (userError || !user) {
+    console.error("User not authenticated");
+    return;
+  }
 
-      const { error } = await supabase
-         .from("contributions")
-         .update({ assigned_to: user.id })
-         .eq("id", contributionId);
+  const { data: agent, error: agentError } = await supabase
+    .from("service_agents")
+    .select("name")
+    .eq("email", user.email)
+    .single();
 
-      if (error) {
-         console.error("Failed to assign contribution:", error.message);
-      } else {
-         fetchUnassignedContributions();
-      }
-   };
+  if (agentError || !agent) {
+    console.error("Agent not found");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("contributions")
+    .update({ assigned_to: agent.name })
+    .eq("id", contributionId);
+
+  if (error) {
+    console.error("Failed to assign contribution:", error.message);
+  } else {
+    fetchUnassignedContributions();
+  }
+};
 
    useEffect(() => {
       fetchUnassignedContributions();

@@ -19,28 +19,40 @@ export default function RejectedContributionsPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchRejectedContributions = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
-    const { data, error } = await supabase
-      .from("contributions")
-      .select("*")
-      .eq("status", "rejected")
-      .eq("assigned_to", user.id)
-      .order("created_at", { ascending: false });
+  const { data: agent, error: agentError } = await supabase
+    .from("service_agents")
+    .select("name")
+    .eq("email", user.email)
+    .single();
 
-    if (error) {
-      console.error("Error fetching rejected contributions:", error.message);
-    } else {
-      setContributions(data || []);
-    }
-
+  if (agentError || !agent) {
+    console.error("Agent not found");
     setLoading(false);
-  };
+    return;
+  }
 
-  useEffect(() => {
-    fetchRejectedContributions();
-  }, []);
+  const { data, error } = await supabase
+    .from("contributions")
+    .select("*")
+    .eq("status", "rejected")
+    .eq("assigned_to", agent.name)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching rejected contributions:", error.message);
+  } else {
+    setContributions(data || []);
+  }
+
+  setLoading(false);
+};
+
+useEffect(() => {
+  fetchRejectedContributions();
+}, []);
 
   return (
     <div>

@@ -18,28 +18,40 @@ export default function ApprovedContributionsPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchApprovedContributions = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
-    const { data, error } = await supabase
-      .from("contributions")
-      .select("*")
-      .eq("status", "approved")
-      .eq("assigned_to", user.id)
-      .order("created_at", { ascending: false });
+  const { data: agent, error: agentError } = await supabase
+    .from("service_agents")
+    .select("name")
+    .eq("email", user.email)
+    .single();
 
-    if (error) {
-      console.error("Error fetching approved contributions:", error.message);
-    } else {
-      setContributions(data || []);
-    }
-
+  if (agentError || !agent) {
+    console.error("Agent not found");
     setLoading(false);
-  };
+    return;
+  }
 
-  useEffect(() => {
-    fetchApprovedContributions();
-  }, []);
+  const { data, error } = await supabase
+    .from("contributions")
+    .select("*")
+    .eq("status", "approved")
+    .eq("assigned_to", agent.name)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching approved contributions:", error.message);
+  } else {
+    setContributions(data || []);
+  }
+
+  setLoading(false);
+};
+
+useEffect(() => {
+  fetchApprovedContributions();
+}, []);
 
   return (
     <div>

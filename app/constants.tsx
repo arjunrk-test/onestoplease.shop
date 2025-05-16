@@ -88,6 +88,7 @@ export const SideBarLinks = [
     icons: ClipboardList,
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
+      { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
       { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
     ],
