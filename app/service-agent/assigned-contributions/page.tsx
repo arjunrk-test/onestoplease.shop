@@ -1,0 +1,238 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+interface Contribution {
+   id: string;
+   product_name: string;
+   full_name: string;
+   phone_number: string;
+   additional_phone: string;
+   address: string;
+   description: string;
+   status: string;
+   assigned_to: string | null;
+   created_at: string;
+   warranty_covered: string;
+   landmark: string;
+   location_link: string;
+   pincode: string;
+   contribution_type: string;
+}
+
+export default function AssignedContributionsPage() {
+   const [contributions, setContributions] = useState<Contribution[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [approveTarget, setApproveTarget] = useState<Contribution | null>(null);
+   const [rejectTarget, setRejectTarget] = useState<Contribution | null>(null);
+   const [rejectionReason, setRejectionReason] = useState("");
+
+
+   const fetchAssignedContributions = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+         setLoading(false);
+         return;
+      }
+
+      const { data, error } = await supabase
+         .from("contributions")
+         .select("*")
+         .eq("assigned_to", user.id)
+         .eq("status", "pending")
+         .order("created_at", { ascending: false });
+
+      if (error) {
+         console.error("Error fetching assigned contributions:", error.message);
+      } else {
+         setContributions(data || []);
+      }
+
+      setLoading(false);
+   };
+
+   const handleUnassign = async (contributionId: string) => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+         console.error("Not authenticated");
+         return;
+      }
+
+      const { error } = await supabase
+         .from("contributions")
+         .update({ assigned_to: null })
+         .eq("id", contributionId)
+         .eq("assigned_to", user.id);
+
+      if (error) {
+         console.error("Failed to unassign:", error.message);
+      } else {
+         fetchAssignedContributions();
+      }
+   };
+
+   useEffect(() => {
+      fetchAssignedContributions();
+   }, []);
+
+   return (
+      <div>
+         <h1 className="text-2xl font-bold mb-6">Assigned to Me</h1>
+
+         {loading ? (
+            <div className="text-center text-muted">Loading...</div>
+         ) : contributions.length === 0 ? (
+            <div className="text-center text-muted">No assigned contributions yet.</div>
+         ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+               {contributions.map((contribution) => (
+                  <div key={contribution.id} className="bg-background text-foreground rounded-lg shadow-md p-4">
+                     <h2 className="text-lg font-semibold mb-2 text-highlight capitalize">{contribution.product_name}</h2>
+
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">By:</strong> {contribution.full_name}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Phone:</strong> {"+" + contribution.phone_number}</p>
+                     {contribution.additional_phone && (
+                        <p className="text-sm text-muted mb-1"><strong className="text-accent">Alt Phone:</strong> {contribution.additional_phone}</p>
+                     )}
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Address:</strong> {contribution.address}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Landmark:</strong> {contribution.landmark}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Location:</strong> <a href={contribution.location_link} target="_blank" className="text-red-500 underline">View</a></p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Pincode:</strong> {contribution.pincode}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Contribution Type:</strong> {contribution.contribution_type}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Warranty Covered:</strong> {contribution.warranty_covered ? "Yes" : "No"}</p>
+                     <p className="text-sm text-muted mb-3"><strong className="text-accent">Description:</strong> {contribution.description}</p>
+
+                     <div className="flex flex-wrap gap-2 mt-3">
+                        <Button
+                           variant="default"
+                           className="bg-yellow-500 hover:bg-yellow-600  text-white h-6 text-sm"
+                           onClick={() => handleUnassign(contribution.id)}
+                        >
+                           Unassign
+                        </Button>
+                        {/* Approve Button */}
+                        <Button
+                           variant="default"
+                           className="text-sm bg-green-500 h-6 text-white hover:bg-green-600"
+                           onClick={() => setApproveTarget(contribution)}
+                        >
+                           Approve
+                        </Button>
+
+                        {/* Reject Button */}
+                        <Button
+                           variant="default"
+                           className="h-6 text-sm bg-red-500 text-white hover:bg-red-600"
+                           onClick={() => {
+                              setRejectTarget(contribution);
+                              setRejectionReason("");
+                           }}
+                        >
+                           Reject
+                        </Button>
+                     </div>
+                  </div>
+               ))}
+            </div>
+         )}
+         {approveTarget && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+                  <h3 className="text-lg font-semibold mb-4 text-highlight">
+                     Approve "{approveTarget.product_name}"?
+                  </h3>
+                  <p className="text-sm text-muted mb-4">
+                     Are you sure you want to mark this contribution as <strong>approved</strong>?
+                  </p>
+                  <div className="flex justify-end gap-3">
+                     <Button variant="default" onClick={() => setApproveTarget(null)}>
+                        Cancel
+                     </Button>
+                     <Button
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={async () => {
+                           const { error } = await supabase
+                              .from("contributions")
+                              .update({ status: "approved" })
+                              .eq("id", approveTarget.id);
+
+                           if (error) {
+                              toast.error("Failed to approve.");
+                           } else {
+                              toast.success("Contribution approved.");
+                              fetchAssignedContributions();
+                           }
+                           setApproveTarget(null);
+                        }}
+                     >
+                        Yes, Approve
+                     </Button>
+                  </div>
+               </div>
+            </div>
+         )}
+
+         {rejectTarget && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+                  <h3 className="text-lg font-semibold mb-4 text-highlight">
+                     Reject "{rejectTarget.product_name}"?
+                  </h3>
+                  <p className="text-sm text-muted mb-2">
+                     Select a reason for rejection:
+                  </p>
+                  <select
+                     className="w-full border rounded p-2 mb-4 text-sm bg-background text-foreground"
+                     value={rejectionReason}
+                     onChange={(e) => setRejectionReason(e.target.value)}
+                  >
+                     <option value="">-- Select reason --</option>
+                     <option value="Product quality is not good">Product quality is not good</option>
+                     <option value="Product is damaged">Product is damaged</option>
+                     <option value="Product already rented elsewhere">Already rented elsewhere</option>
+                     <option value="Incomplete product set">Incomplete product set</option>
+                     <option value="Owner unavailable">Owner unavailable</option>
+                     <option value="Incorrect product category">Incorrect category</option>
+                  </select>
+
+                  <div className="flex justify-end gap-3">
+                     <Button variant="default" onClick={() => setRejectTarget(null)}>
+                        Cancel
+                     </Button>
+                     <Button
+                        disabled={!rejectionReason}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        onClick={async () => {
+                           const { error } = await supabase
+                              .from("contributions")
+                              .update({
+                                 status: "rejected",
+                                 rejection_reason: rejectionReason
+                              })
+
+                              .eq("id", rejectTarget.id);
+
+                           if (error) {
+                              toast.error("Failed to reject.");
+                           } else {
+                              toast.success("Contribution rejected.");
+                              fetchAssignedContributions();
+                           }
+
+                           setRejectTarget(null);
+                           setRejectionReason("");
+                        }}
+                     >
+                        Confirm Reject
+                     </Button>
+                  </div>
+               </div>
+            </div>
+         )}
+      </div>
+   );
+}
