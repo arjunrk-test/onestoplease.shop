@@ -88,3 +88,20 @@ export const Locations = [
       icons: ClipboardList,
      }
  ];
+
+
+ import { BsBoxSeam } from "react-icons/bs";
+ import { CiCircleCheck } from "react-icons/ci";
+ import { IoCloseCircleOutline } from "react-icons/io5";
+ import { IoClipboardOutline } from "react-icons/io5";
+
+
+ export const AgentSidebarLinks = [
+  {name: "Contributions", path: "/service-agent/contributions", icons: IoClipboardOutline,
+    submenu: [
+      {name:"All Contributions", path:"/service-agent/all-contributions", icon: BsBoxSeam,},
+      {name:"Unassigned", path:"/service-agent/unassigned-contributions", icon:IoCloseCircleOutline,},
+      {name:"Assigned", path:"/service-agent/assigned-contributions", icon:CiCircleCheck,},
+    ],
+  },
+ ];
