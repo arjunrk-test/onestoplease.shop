@@ -92,6 +92,7 @@ export const SideBarLinks = [
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
+      { name: "Assigned", path: "/admin/contributions/assigned-contributions", icon: FiInbox, },
       { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
     ],
@@ -121,7 +122,7 @@ export const AgentSidebarLinks = [
     name: "Contributions", path: "/service-agent/contributions", icons: IoClipboardOutline,
     submenu: [
       { name: "All Contributions", path: "/service-agent/all-contributions", icon: BsBoxSeam, },
-      { name: "Unassigned", path: "/service-agent/unassigned-contributions", icon: FiInbox, },
+      { name: "Pending", path: "/service-agent/pending-contributions", icon: FiInbox, },
       { name: "Assigned", path: "/service-agent/assigned-contributions", icon: FiUserCheck, },
       { name: "Approved", path: "/service-agent/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/service-agent/rejected-contributions", icon: FiXCircle, },

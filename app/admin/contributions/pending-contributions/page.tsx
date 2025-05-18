@@ -90,19 +90,27 @@ export default function PendingContributionsPage() {
    };
 
    const assignAgent = async (contributionId: string, agentName: string) => {
-      const { error } = await supabase
-         .from("contributions")
-         .update({ assigned_to: agentName })
-         .eq("id", contributionId);
+  const { error } = await supabase
+    .from("contributions")
+    .update({
+      assigned_to: agentName,
+      status: "assigned",
+    })
+    .eq("id", contributionId);
 
-      if (!error) {
-         setContributions((prev) =>
-            prev.map((c) => (c.id === contributionId ? { ...c, assigned_to: agentName } : c))
-         );
-      } else {
-         console.error("Error assigning agent:", error.message);
-      }
-   };
+  if (!error) {
+    setContributions((prev) =>
+      prev.map((c) =>
+        c.id === contributionId
+          ? { ...c, assigned_to: agentName, status: "assigned" } 
+          : c
+      )
+    );
+  } else {
+    console.error("Error assigning agent:", error.message);
+  }
+};
+
 
    useEffect(() => {
       fetchTotalCount();
@@ -175,7 +183,7 @@ export default function PendingContributionsPage() {
                                           ? "text-green-500"
                                           : item.status === "rejected"
                                              ? "text-red-500"
-                                             : "text-yellow-500"
+                                             : item.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                                     }
                                  />
                                  <span className="capitalize">{item.status}</span>
@@ -270,7 +278,7 @@ export default function PendingContributionsPage() {
                                     ? "text-green-500"
                                     : selectedContribution.status === "rejected"
                                        ? "text-red-500"
-                                       : "text-yellow-500"
+                                       : selectedContribution.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                               }
                            />
                            <span className="capitalize">{selectedContribution.status}</span>

@@ -64,9 +64,13 @@ export default function UnassignedContributionsPage() {
   }
 
   const { error } = await supabase
-    .from("contributions")
-    .update({ assigned_to: agent.name })
-    .eq("id", contributionId);
+  .from("contributions")
+  .update({
+    assigned_to: agent.name,
+    status: "assigned",
+  })
+  .eq("id", contributionId);
+
 
   if (error) {
     console.error("Failed to assign contribution:", error.message);
