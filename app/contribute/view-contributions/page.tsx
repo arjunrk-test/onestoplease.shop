@@ -35,6 +35,10 @@ type Contribution = {
    landmark: string;
    phone_number: string;
    rejection_reason: string;
+   service_agents?: {
+      name: string;
+      phone: string;
+   };
 };
 
 export default function ViewContributions() {
@@ -62,9 +66,16 @@ export default function ViewContributions() {
 
          const { data, error } = await supabase
             .from("contributions")
-            .select("*")
+            .select(`
+    *,
+    service_agents (
+      name,
+      phone
+    )
+  `)
             .eq("user_id", user.id)
             .order("created_at", { ascending: false });
+
 
          if (error) {
             toast.error("Failed to load contributions.");
@@ -172,7 +183,7 @@ export default function ViewContributions() {
                                                 ? "text-green-500"
                                                 : item.status === "rejected"
                                                    ? "text-red-500"
-                                                   : "text-yellow-500"
+                                                   : item.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                                           }
                                        />
                                        <span className="capitalize">{item.status}</span>
@@ -183,6 +194,18 @@ export default function ViewContributions() {
                                           <strong>Reason:</strong> {item.rejection_reason}
                                        </p>
                                     )}
+                                    {item.status === "assigned" && item.service_agents && (
+                                       <div>
+                                          <p className="text-sm mt-2 ">
+                                             <strong className="text-blue-500">Assigned Service Agent:</strong> {item.service_agents.name}
+                                          </p>
+                                          <p className="text-sm mt-2 ">
+                                             <strong className="text-blue-500">Service Agent Contact:</strong> {"+91 " + item.service_agents.phone}
+                                          </p>
+                                       </div>
+
+                                    )}
+
                                  </div>
 
                                  <div className="flex gap-2">
@@ -341,21 +364,55 @@ export default function ViewContributions() {
                      <Button
                         className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={async () => {
+                           // 1. Parse the folder path from image_url or bill_url
+                           let folderPath = "";
+                           try {
+                              const imageUrl = deleteTarget.image_urls[0];
+                              const parts = new URL(imageUrl).pathname.split("/");
+                              folderPath = parts.slice(parts.indexOf("contributor-product-images") + 1, -1).join("/"); // gets 919876543210/abcd
+                           } catch (err) {
+                              console.error("Failed to parse folder path:", err);
+                           }
+
+                           // 2. List all files in that folder from both buckets
+                           const imageList = await supabase.storage
+                              .from("contributor-product-images")
+                              .list(folderPath, { limit: 100 });
+
+                           const billList = await supabase.storage
+                              .from("contributor-product-bill")
+                              .list(folderPath, { limit: 100 });
+
+                           // 3. Construct full paths for deletion
+                           const imageFilesToDelete = imageList.data?.map(file => `${folderPath}/${file.name}`) || [];
+                           const billFilesToDelete = billList.data?.map(file => `${folderPath}/${file.name}`) || [];
+
+                           // 4. Delete files
+                           if (imageFilesToDelete.length > 0) {
+                              await supabase.storage.from("contributor-product-images").remove(imageFilesToDelete);
+                           }
+
+                           if (billFilesToDelete.length > 0) {
+                              await supabase.storage.from("contributor-product-bill").remove(billFilesToDelete);
+                           }
+
+                           // 5. Delete row from contributions table
                            const { error } = await supabase
                               .from("contributions")
                               .delete()
                               .eq("id", deleteTarget.id);
 
                            if (error) {
-                              toast.error("Failed to delete.");
+                              toast.error("Failed to delete contribution.");
                            } else {
-                              toast.success("Contribution deleted.");
+                              toast.success("Contribution and associated files deleted.");
                               setContributions((prev) => prev.filter((c) => c.id !== deleteTarget.id));
                               setExpandedId(null);
                            }
-
                            setDeleteTarget(null);
+
                         }}
+
                      >
                         Yes, Delete
                      </Button>

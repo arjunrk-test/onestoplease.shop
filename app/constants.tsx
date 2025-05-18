@@ -68,6 +68,9 @@ export const CategoriesPath = Categories.map((category) => ({
 }));
 
 import { ClipboardList, } from "lucide-react";
+import { LuUsers } from "react-icons/lu";
+import { RiAdminLine } from "react-icons/ri";
+
 export const SideBarLinks = [
   {
     name: "edit products",
@@ -89,8 +92,16 @@ export const SideBarLinks = [
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
+      { name: "Assigned", path: "/admin/contributions/assigned-contributions", icon: FiUserCheck, },
       { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
+    ],
+  },
+  {
+    name: "Add Users", path: "/admin/add-users", icons: ClipboardList,
+    submenu: [
+      { name: "Add Admin User", path: "/admin/add-users/add-admin", icon: RiAdminLine, },
+      { name: "Add Service Agent", path: "/admin/add-users/add-service-agent", icon: LuUsers, },
     ],
   },
   {
@@ -111,7 +122,7 @@ export const AgentSidebarLinks = [
     name: "Contributions", path: "/service-agent/contributions", icons: IoClipboardOutline,
     submenu: [
       { name: "All Contributions", path: "/service-agent/all-contributions", icon: BsBoxSeam, },
-      { name: "Unassigned", path: "/service-agent/unassigned-contributions", icon: FiInbox, },
+      { name: "Pending", path: "/service-agent/pending-contributions", icon: FiInbox, },
       { name: "Assigned", path: "/service-agent/assigned-contributions", icon: FiUserCheck, },
       { name: "Approved", path: "/service-agent/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/service-agent/rejected-contributions", icon: FiXCircle, },

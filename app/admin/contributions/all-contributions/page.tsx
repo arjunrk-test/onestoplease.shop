@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { FaDotCircle } from "react-icons/fa";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 
-type StatusType = "pending" | "approved" | "rejected";
+type StatusType = "pending" | "assigned" | "approved" | "rejected";
 
 interface Contribution {
    id: string;
@@ -170,7 +170,7 @@ export default function AllContributionsPage() {
                                           ? "text-green-500"
                                           : item.status === "rejected"
                                              ? "text-red-500"
-                                             : "text-yellow-500"
+                                             : item.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                                     }
                                  />
                                  <span className="capitalize">{item.status}</span>
@@ -227,7 +227,7 @@ export default function AllContributionsPage() {
                                     ? "text-green-500"
                                     : selectedContribution.status === "rejected"
                                        ? "text-red-500"
-                                       : "text-yellow-500"
+                                       : selectedContribution.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                               }
                            />
                            <span className="capitalize">{selectedContribution.status}</span>

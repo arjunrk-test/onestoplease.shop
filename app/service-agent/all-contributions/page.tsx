@@ -7,7 +7,7 @@ import { SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/compon
 import { Button } from "@/components/ui/button";
 import { FaDotCircle } from "react-icons/fa";
 
-type StatusType = "all" | "pending" | "approved" | "rejected";
+type StatusType = "all" | "pending" | "assigned" | "approved" | "rejected";
 
 interface Contribution {
    id: string;
@@ -31,6 +31,7 @@ export default function AllContributionsPage() {
    const [counts, setCounts] = useState<StatusCounts>({
       all: 0,
       pending: 0,
+      assigned: 0,
       approved: 0,
       rejected: 0,
    });
@@ -69,6 +70,7 @@ export default function AllContributionsPage() {
       const newCounts: StatusCounts = {
          all: 0,
          pending: 0,
+         assigned: 0,
          approved: 0,
          rejected: 0,
       };
@@ -76,7 +78,7 @@ export default function AllContributionsPage() {
       const { data: allData } = await supabase.from("contributions").select("id");
       newCounts.all = allData?.length || 0;
 
-      const statuses: StatusType[] = ["pending", "approved", "rejected"];
+      const statuses: StatusType[] = ["pending", "assigned", "approved", "rejected"];
       for (const status of statuses) {
          const { data } = await supabase
             .from("contributions")
@@ -112,6 +114,7 @@ export default function AllContributionsPage() {
                <SelectContent className="bg-background text-sm text-foreground border-none">
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="all">All ({counts.all})</SelectItem>
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="pending">Pending ({counts.pending})</SelectItem>
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="assigned">Assigned ({counts.assigned})</SelectItem>
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="approved">Approved ({counts.approved})</SelectItem>
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="rejected">Rejected ({counts.rejected})</SelectItem>
                </SelectContent>
@@ -149,7 +152,7 @@ export default function AllContributionsPage() {
                                        ? "text-green-500"
                                        : contribution.status === "rejected"
                                           ? "text-red-500"
-                                          : "text-yellow-500"
+                                          : contribution.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                                  }
                               />
                               <span className="capitalize">{contribution.status}</span>

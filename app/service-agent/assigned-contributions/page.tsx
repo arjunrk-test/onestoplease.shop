@@ -54,7 +54,7 @@ export default function AssignedContributionsPage() {
     .from("contributions")
     .select("*")
     .eq("assigned_to", agent.name)
-    .eq("status", "pending")
+    .eq("status", "assigned")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -85,10 +85,14 @@ const handleUnassign = async (contributionId: string) => {
   }
 
   const { error } = await supabase
-    .from("contributions")
-    .update({ assigned_to: null })
-    .eq("id", contributionId)
-    .eq("assigned_to", agent.name);
+  .from("contributions")
+  .update({
+    assigned_to: null,
+    status: "pending",
+  })
+  .eq("id", contributionId)
+  .eq("assigned_to", agent.name);
+
 
   if (error) {
     console.error("Failed to unassign:", error.message);

@@ -30,7 +30,7 @@ interface Contribution {
 
 const ITEMS_PER_PAGE = 30;
 
-export default function RejectedContributionsPage() {
+export default function AssignedContributionsPage() {
    const [contributions, setContributions] = useState<Contribution[]>([]);
    const [loading, setLoading] = useState(true);
    const [page, setPage] = useState(1);
@@ -41,40 +41,44 @@ export default function RejectedContributionsPage() {
    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
    const fetchContributions = async (pageNum: number) => {
-      setLoading(true);
+  setLoading(true);
 
-      const from = (pageNum - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
+  const from = (pageNum - 1) * ITEMS_PER_PAGE;
+  const to = from + ITEMS_PER_PAGE - 1;
 
-      const { data, error } = await supabase
-         .from("contributions")
-         .select(
-            "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, image_urls, bill_url, rejection_reason",
-            { count: "exact" }
-         )
-         .eq("status", "rejected")
-         .order("created_at", { ascending: false })
-         .range(from, to);
+  const { data, error } = await supabase
+    .from("contributions")
+    .select(
+      "id, full_name, phone_number, additional_phone, address, landmark, location_link, pincode, product_name, description, contribution_type, warranty_covered, warranty_start, warranty_end, status, assigned_to, image_urls, bill_url, rejection_reason",
+      { count: "exact" }
+    )
+    .eq("status", "assigned")
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
-      if (error) {
-         console.error("Error fetching contributions:", error.message);
-      } else {
-         setContributions(data || []);
-      }
+  if (error) {
+    console.error("Error fetching contributions:", error.message);
+    toast.error("Failed to load assigned contributions.");
+  } else {
+    setContributions(data || []);
+  }
 
-      setLoading(false);
-   };
+  setLoading(false);
+};
+
 
 
    const fetchTotalCount = async () => {
-      const { count, error } = await supabase
-         .from("contributions")
-         .select("id", { count: "exact", head: true });
+  const { count, error } = await supabase
+    .from("contributions")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "assigned");
 
-      if (!error && count !== null) {
-         setTotalItems(count);
-      }
-   };
+  if (!error && count !== null) {
+    setTotalItems(count);
+  }
+};
+
 
    const handleRowClick = async (contribution: Contribution) => {
       setSelectedContribution(contribution);
@@ -88,12 +92,11 @@ export default function RejectedContributionsPage() {
       fetchContributions(page);
    }, [page]);
 
-
    return (
       <div className="p-4">
          {/* Header */}
          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-highlight">Rejected Contributions</h1>
+            <h1 className="text-2xl font-bold text-highlight">Assigned Contributions</h1>
 
             {totalPages > 1 && (
                <div className="flex items-center gap-4">
@@ -134,7 +137,7 @@ export default function RejectedContributionsPage() {
                         <TableHead>Product Name</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Phone Number</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>Action</TableHead>
                      </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -169,9 +172,6 @@ export default function RejectedContributionsPage() {
                                  Revoke
                               </Button>
                            </TableCell>
-
-
-
                         </TableRow>
                      ))}
                   </TableBody>
@@ -222,7 +222,7 @@ export default function RejectedContributionsPage() {
                                     ? "text-green-500"
                                     : selectedContribution.status === "rejected"
                                        ? "text-red-500"
-                                       : selectedContribution.status === "assigned" ? "text-blue-500" :  "text-yellow-500"
+                                       : selectedContribution.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                               }
                            />
                            <span className="capitalize">{selectedContribution.status}</span>
@@ -329,48 +329,46 @@ export default function RejectedContributionsPage() {
             </DialogContent>
          </Dialog>
          {revokeTarget && (
-            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
-                  <h3 className="text-lg font-semibold mb-4 text-highlight">
-                     Revoke "{revokeTarget.product_name}"?
-                  </h3>
-                  <p className="text-sm text-muted mb-4">
-                     This will change the status to <strong>pending</strong> and remove the rejection reason.
-                  </p>
-                  <div className="flex justify-end gap-3">
-                     <Button variant="outline" onClick={() => setRevokeTarget(null)}>
-                        Cancel
-                     </Button>
-                     <Button
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                        onClick={async () => {
-                           const { error } = await supabase
-                              .from("contributions")
-                              .update({
-                                 status: "pending",
-                                 assigned_to: null,
-                                 rejection_reason: null
-                              })
-                              .eq("id", revokeTarget.id);
-
-                           if (error) {
-                              toast.error("Failed to revoke.");
-                              console.error("Revoke failed:", error.message);
-                           } else {
-                              toast.success("Contribution status set to pending.");
-                              fetchContributions(page);
-                           }
-
-                           setRevokeTarget(null);
-                        }}
-                     >
-                        Yes, Revoke
-                     </Button>
-                  </div>
-               </div>
-            </div>
-         )}
-
+                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+                        <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+                           <h3 className="text-lg font-semibold mb-4 text-highlight">
+                              Revoke "{revokeTarget.product_name}"?
+                           </h3>
+                           <p className="text-sm text-muted mb-4">
+                              This will change the status to <strong>pending</strong>.
+                           </p>
+                           <div className="flex justify-end gap-3">
+                              <Button variant="outline" onClick={() => setRevokeTarget(null)}>
+                                 Cancel
+                              </Button>
+                              <Button
+                                 className="bg-red-600 hover:bg-red-700 text-white"
+                                 onClick={async () => {
+                                    const { error } = await supabase
+                                       .from("contributions")
+                                       .update({
+                                          status: "pending",
+                                          assigned_to: null,
+                                       })
+                                       .eq("id", revokeTarget.id);
+         
+                                    if (error) {
+                                       toast.error("Failed to revoke.");
+                                       console.error("Revoke failed:", error.message);
+                                    } else {
+                                       toast.success("Contribution status set to pending.");
+                                       fetchContributions(page);
+                                    }
+         
+                                    setRevokeTarget(null);
+                                 }}
+                              >
+                                 Yes, Revoke
+                              </Button>
+                           </div>
+                        </div>
+                     </div>
+                  )}
       </div>
    );
 }

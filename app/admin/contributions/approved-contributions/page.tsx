@@ -149,7 +149,7 @@ export default function ApprovedContributionsPage() {
                                           ? "text-green-500"
                                           : item.status === "rejected"
                                              ? "text-red-500"
-                                             : "text-yellow-500"
+                                             : item.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                                     }
                                  />
                                  <span className="capitalize">{item.status}</span>
@@ -218,7 +218,7 @@ export default function ApprovedContributionsPage() {
                                     ? "text-green-500"
                                     : selectedContribution.status === "rejected"
                                        ? "text-red-500"
-                                       : "text-yellow-500"
+                                       : selectedContribution.status === "assigned" ? "text-blue-500" : "text-yellow-500"
                               }
                            />
                            <span className="capitalize">{selectedContribution.status}</span>
