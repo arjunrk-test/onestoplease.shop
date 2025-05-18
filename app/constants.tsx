@@ -68,6 +68,9 @@ export const CategoriesPath = Categories.map((category) => ({
 }));
 
 import { ClipboardList, } from "lucide-react";
+import { LuUsers } from "react-icons/lu";
+import { RiAdminLine } from "react-icons/ri";
+
 export const SideBarLinks = [
   {
     name: "edit products",
@@ -91,6 +94,13 @@ export const SideBarLinks = [
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
       { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
+    ],
+  },
+  {
+    name: "Add Users", path: "/admin/add-users", icons: ClipboardList,
+    submenu: [
+      { name: "Add Admin User", path: "/admin/add-users/add-admin", icon: RiAdminLine, },
+      { name: "Add Service Agent", path: "/admin/add-users/add-service-agent", icon: LuUsers, },
     ],
   },
   {
