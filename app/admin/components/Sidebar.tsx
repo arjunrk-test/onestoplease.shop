@@ -43,6 +43,8 @@ const Sidebar: React.FC = () => {
 
   // ✅ Expand menu based on current pathname
   useEffect(() => {
+    if (!pathname) return;
+
     const updatedOpenMenus: Record<string, boolean> = {};
 
     SideBarLinks.forEach((link: SidebarLink) => {
@@ -53,6 +55,7 @@ const Sidebar: React.FC = () => {
 
     setOpenMenus(updatedOpenMenus);
   }, [pathname]);
+
 
   const toggleMenu = (menuName: string) => {
     setOpenMenus((prev) => ({
@@ -97,8 +100,8 @@ const Sidebar: React.FC = () => {
                 {link.submenu ? (
                   <div
                     className={`flex items-center justify-between gap-3 p-2 m-2 text-sm duration-150 rounded-xl transition-all cursor-pointer ${isOpen
-                        ? "bg-highlight text-black"
-                        : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
+                      ? "bg-highlight text-black"
+                      : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
                       }`}
                     onClick={() => toggleMenu(link.name)}
                   >
@@ -114,8 +117,8 @@ const Sidebar: React.FC = () => {
                   <Link href={link.path || "#"}>
                     <div
                       className={`flex items-center gap-3 p-2 m-2 text-sm duration-150 rounded-xl transition-all cursor-pointer ${pathname === link.path
-                          ? "bg-highlight text-black"
-                          : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
+                        ? "bg-highlight text-black"
+                        : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
                         }`}
                     >
                       <Icon className="text-xl" />
@@ -132,7 +135,7 @@ const Sidebar: React.FC = () => {
                       return (
                         <Link key={subLink.name} href={subLink.path}>
                           <div
-                            className={` group flex items-center gap-2 p-2 m-1 text-sm rounded-lg transition-all cursor-pointer ${pathname.replace(/\/$/, "") === subLink.path.replace(/\/$/, "")
+                            className={` group flex items-center gap-2 p-2 m-1 text-sm rounded-lg transition-all cursor-pointer ${(pathname ?? "").replace(/\/$/, "") === subLink.path.replace(/\/$/, "")
                                 ? "bg-highlight text-black"
                                 : "bg-transparent text-white hover:bg-highlight hover:text-black"
                               }`}
@@ -147,6 +150,7 @@ const Sidebar: React.FC = () => {
                     })}
                   </div>
                 )}
+
 
               </div>
             );

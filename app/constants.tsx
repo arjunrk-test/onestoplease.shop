@@ -92,7 +92,7 @@ export const SideBarLinks = [
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
-      { name: "Assigned", path: "/admin/contributions/assigned-contributions", icon: FiInbox, },
+      { name: "Assigned", path: "/admin/contributions/assigned-contributions", icon: FiUserCheck, },
       { name: "Approved", path: "/admin/contributions/approved-contributions", icon: FiCheckCircle, },
       { name: "Rejected", path: "/admin/contributions/rejected-contributions", icon: FiXCircle, },
     ],

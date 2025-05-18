@@ -43,16 +43,17 @@ const Sidebar: React.FC = () => {
 
   // ✅ Expand menu based on current pathname
   useEffect(() => {
-    const updatedOpenMenus: Record<string, boolean> = {};
+  const updatedOpenMenus: Record<string, boolean> = {};
 
-    AgentSidebarLinks.forEach((link: AgentSidebarLink) => {
-      if (link.submenu?.some((sub) => pathname.startsWith(sub.path))) {
-        updatedOpenMenus[link.name] = true;
-      }
-    });
+  AgentSidebarLinks.forEach((link: AgentSidebarLink) => {
+    if (link.submenu?.some((sub) => (pathname ?? "").startsWith(sub.path))) {
+      updatedOpenMenus[link.name] = true;
+    }
+  });
 
-    setOpenMenus(updatedOpenMenus);
-  }, [pathname]);
+  setOpenMenus(updatedOpenMenus);
+}, [pathname]);
+
 
   const toggleMenu = (menuName: string) => {
     setOpenMenus((prev) => ({
@@ -132,7 +133,7 @@ const Sidebar: React.FC = () => {
                       return (
                         <Link key={subLink.name} href={subLink.path}>
                           <div
-                            className={` group flex items-center gap-2 p-2 m-1 text-sm rounded-lg transition-all cursor-pointer ${pathname.replace(/\/$/, "") === subLink.path.replace(/\/$/, "")
+                            className={` group flex items-center gap-2 p-2 m-1 text-sm rounded-lg transition-all cursor-pointer ${(pathname ?? "").replace(/\/$/, "") === subLink.path.replace(/\/$/, "")
                                 ? "bg-highlight text-black"
                                 : "bg-transparent text-white hover:bg-highlight hover:text-black"
                               }`}
