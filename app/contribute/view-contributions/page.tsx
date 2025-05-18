@@ -197,7 +197,7 @@ export default function ViewContributions() {
                                     {item.status === "assigned" && item.service_agents && (
                                        <div>
                                           <p className="text-sm mt-2 ">
-                                             <strong className="text-blue-500">Assigned Agent:</strong> {item.service_agents.name}
+                                             <strong className="text-blue-500">Assigned Service Agent:</strong> {item.service_agents.name}
                                           </p>
                                           <p className="text-sm mt-2 ">
                                              <strong className="text-blue-500">Service Agent Contact:</strong> {"+91 " + item.service_agents.phone}
