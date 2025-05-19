@@ -85,7 +85,7 @@ export default function WishlistPage() {
                   <p className="text-foreground text-xl mb-4">Wishlist is empty.</p>
                   <Button
                      onClick={() => router.push("/products")}
-                     className="bg-highlight hover:bg-highlight/80"
+                     className="bg-highlight hover:bg-highlightHover"
                   >
                      Continue Shopping
                   </Button>

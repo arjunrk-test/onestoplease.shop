@@ -124,7 +124,7 @@ export default function ProductForm({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <label className="relative cursor-pointer bg-highlight text-white px-4 py-0 rounded-md hover:bg-highlight/80 transition">
+                    <label className="relative cursor-pointer bg-highlight text-white px-4 py-0 rounded-md hover:bg-highlightHover transition">
                       Choose File
                       <input
                         ref={fileInputRef}
@@ -180,7 +180,7 @@ export default function ProductForm({
             {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
           </div>
 
-          <Button type="submit" className="bg-highlight text-white hover:bg-highlight/80">
+          <Button type="submit" className="bg-highlight text-white hover:bg-highlightHover">
             {isEditing ? "Update" : "Submit"}
           </Button>
           {errors.submit && <p className="text-red-500 text-xs mt-1">{errors.submit}</p>}

@@ -329,7 +329,7 @@ export default function Contribute() {
               <div className="md:col-span-2 text-center">
                 <Button
                   type="button"
-                  className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80"
+                  className="px-6 py-3 text-base bg-highlight hover:bg-highlightHover"
                   onClick={() => {
                     const requiredFields = [
                       form.fullName,

@@ -69,7 +69,7 @@ export default function Navbar() {
       ) : (
         <Button
           onClick={() => openLogin()}
-          className="px-6 py-3 h-8 text-md text-white bg-highlight hover:bg-highlight/80"
+          className="px-6 py-3 h-8 text-md text-white bg-highlight hover:bg-highlightHover"
           variant="default"
         >
           Login

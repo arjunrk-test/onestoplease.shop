@@ -17,7 +17,7 @@ const ProfileDropdown = () => {
           <DropdownMenu.Trigger asChild>
             <Button
               variant="default"
-              className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlight/80"
+              className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlightHover"
             >
               Profile <ChevronDown className="w-4 h-4" />
             </Button>
@@ -47,7 +47,7 @@ const ProfileDropdown = () => {
                 <Button
                   onClick={signOut}
                   variant="default"
-                  className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlight/80 rounded-md"
+                  className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlightHover rounded-md"
                 >
                   <CiLogout className="text-2xl" /> Logout
                 </Button>

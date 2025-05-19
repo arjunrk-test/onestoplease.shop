@@ -34,7 +34,7 @@ export default function CartPage() {
             <Navbar />
             <div className="flex flex-col items-center justify-center flex-1 text-center p-6 bg-background text-foreground">
                <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-               <Button onClick={() => router.push("/products")} className="bg-highlight hover:bg-highlight/80">
+               <Button onClick={() => router.push("/products")} className="bg-highlight hover:bg-highlightHover">
                   Continue Shopping
                </Button>
             </div>
@@ -147,7 +147,7 @@ export default function CartPage() {
                      </Button>
                      <Button
                         onClick={() => alert("Checkout coming soon!")}
-                        className="bg-highlight hover:bg-highlight/80 text-sm"
+                        className="bg-highlight hover:bg-highlightHover text-sm"
                      >
                         Proceed to Checkout
                      </Button>

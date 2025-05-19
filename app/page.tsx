@@ -21,13 +21,18 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/products">
-                <Button className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80">
+                <Button className="px-6 py-3 text-base bg-highlight hover:bg-highlightHover">
                   Explore Products
                 </Button>
               </Link>
               <Link href="/contribute">
-                <Button className="px-6 py-3 text-base bg-accent hover:bg-highlight/80">
+                <Button className="px-6 py-3 text-base bg-green-500 hover:bg-green-600">
                   Contribute & earn
+                </Button>
+              </Link>
+              <Link href="/contribute/view-contributions">
+                <Button className="px-6 py-3 text-base bg-yellow-500 hover:bg-yellow-600">
+                  View contributions
                 </Button>
               </Link>
             </div>

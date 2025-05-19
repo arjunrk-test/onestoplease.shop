@@ -93,14 +93,14 @@ export default function Settings() {
               <Button
                 variant="default"
                 onClick={addNewAddress}
-                className="w-full bg-highlight hover:bg-highlight/80"
+                className="w-full bg-highlight hover:bg-highlightHover"
               >
                 Add New Address
               </Button>
             </div>
 
             <div className="space-y-4">
-              <Button onClick={handleSave} className="w-full bg-highlight hover:bg-highlight/80">
+              <Button onClick={handleSave} className="w-full bg-highlight hover:bg-highlightHover">
                 Save Changes
               </Button>
             </div>

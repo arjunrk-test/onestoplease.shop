@@ -123,7 +123,7 @@ export default function ProductCard({ product }: { product: Product }) {
                           router.push("/cart");
                           toast.dismiss(t);
                         }}
-                        className="bg-highlight hover:bg-highlight/80 text-white text-xs px-3 py-1 rounded-md"
+                        className="bg-highlight hover:bg-highlightHover text-white text-xs px-3 py-1 rounded-md"
                       >
                         Go to Cart
                       </button>
