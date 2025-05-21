@@ -7,9 +7,10 @@ import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import MobileNavbar from "@/components/MobileNavbar";
 
 interface Product {
-   id: string; 
+   id: string;
    name: string;
    price: number;
    image_url: string;
@@ -74,8 +75,12 @@ export default function WishlistPage() {
 
    return (
       <main className="min-h-screen flex flex-col bg-background">
-         <Navbar />
-         <div className="container mx-auto px-6 py-10">
+         <div className="hidden md:block">
+            <Navbar />
+         </div>
+         <div className="md:hidden">
+            <MobileNavbar />
+         </div>         <div className="container mx-auto px-6 py-10">
             <h1 className="text-3xl font-bold mb-6 text-foreground">Your Wishlist</h1>
 
             {loading ? (

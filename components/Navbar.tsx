@@ -12,6 +12,7 @@ import { IoIosCart } from "react-icons/io";
 import { useCartStore } from "@/lib/cartStore";
 import { useLoginDialog } from "@/hooks/useLoginDialog";
 import { useUserRole } from "@/hooks/useUserRole";
+import Image from "next/image";
 
 export default function Navbar() {
   const [location, setLocation] = useState("Chennai");
@@ -22,11 +23,19 @@ export default function Navbar() {
   const { role, loading } = useUserRole();
 
   return (
-    <nav className="w-full sticky top-0 px-48 py-4 bg-gray shadow-sm flex items-center justify-between gap-6">
+    <nav className="w-full sticky top-0 px-48 py-2 bg-gray shadow-sm flex items-center justify-between gap-6">
       {/* Logo */}
-      <Link href="/" className="text-2xl font-bold text-highlight">
-        OneStopLease
+      <Link href="/" className="flex items-center text-2xl font-bold text-highlight">
+        <Image
+          src="/logo.png"
+          alt="OneStopLease Logo"
+          width={56}
+          height={56}
+          className="rounded"
+        />
+        <span>OneStopLease</span>
       </Link>
+
 
       {/* Location Dropdown */}
       <select
