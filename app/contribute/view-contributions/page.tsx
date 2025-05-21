@@ -15,6 +15,7 @@ import { useLoginDialog } from "@/hooks/useLoginDialog";
 import OtpLoginDialog from "@/components/OtpLoginDialog";
 import Spinner from "@/components/Spinner";
 import { FaDotCircle } from "react-icons/fa";
+import MobileNavbar from "@/components/MobileNavbar";
 
 type Contribution = {
    id: string;
@@ -118,8 +119,12 @@ export default function ViewContributions() {
 
    return (
       <>
-         <Navbar />
-         <main className="min-h-[calc(100vh-66px)] bg-background text-foreground p-6">
+         <div className="hidden md:block">
+            <Navbar />
+         </div>
+         <div className="md:hidden">
+            <MobileNavbar />
+         </div>         <main className="min-h-[calc(100vh-66px)] bg-background text-foreground p-6">
             <OtpLoginDialog />
             {!hydrated ? (
                <div className="flex items-center justify-center h-48">

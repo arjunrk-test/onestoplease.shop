@@ -72,7 +72,7 @@ export default function SingleFileUpload({
         {required && <span className="text-red-500"> *</span>}
       </Label>
       <div className="flex items-center gap-2 flex-wrap">
-        <label className="relative cursor-pointer bg-highlight text-white px-4 py-1 rounded-md hover:bg-highlight/80 transition">
+        <label className="relative cursor-pointer bg-highlight text-white px-4 py-1 rounded-md hover:bg-highlightHover transition">
           Choose File
           <input
             ref={fileRef}

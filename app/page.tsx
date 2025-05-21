@@ -3,12 +3,17 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Categories } from "./constants";
+import MobileNavbar from "@/components/MobileNavbar";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col bg-gray"> 
-      <Navbar />
-      
+    <main className="min-h-screen flex flex-col bg-gray">
+      <div className="hidden md:block">
+        <Navbar />
+      </div>
+      <div className="md:hidden">
+        <MobileNavbar />
+      </div>
       {/* Hero Section */}
       <section className="w-full px-6 py-10 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
@@ -21,13 +26,18 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/products">
-                <Button className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80">
+                <Button className="px-6 py-3 text-base bg-highlight hover:bg-highlightHover">
                   Explore Products
                 </Button>
               </Link>
               <Link href="/contribute">
-                <Button className="px-6 py-3 text-base bg-accent hover:bg-highlight/80">
+                <Button className="px-6 py-3 text-base bg-green-500 hover:bg-green-600">
                   Contribute & earn
+                </Button>
+              </Link>
+              <Link href="/contribute/view-contributions">
+                <Button className="px-6 py-3 text-base bg-yellow-500 hover:bg-yellow-600">
+                  View contributions
                 </Button>
               </Link>
             </div>

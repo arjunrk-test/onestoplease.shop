@@ -10,19 +10,19 @@ import { useAuth } from "@/components/AuthProvider";
 import { IconType } from "react-icons";
 
 // Define the structure for submenu links
-  interface SubLink {
-    name: string;
-    path: string;
-    icon: IconType;
-  }
+interface SubLink {
+  name: string;
+  path: string;
+  icon: IconType;
+}
 
-  // Define the main sidebar link structure
-  interface AgentSidebarLink {
-    name: string;
-    path?: string;
-    icons: React.ElementType;
-    submenu?: SubLink[];
-  }
+// Define the main sidebar link structure
+interface AgentSidebarLink {
+  name: string;
+  path?: string;
+  icons: React.ElementType;
+  submenu?: SubLink[];
+}
 
 const Sidebar: React.FC = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -43,16 +43,16 @@ const Sidebar: React.FC = () => {
 
   // ✅ Expand menu based on current pathname
   useEffect(() => {
-  const updatedOpenMenus: Record<string, boolean> = {};
+    const updatedOpenMenus: Record<string, boolean> = {};
 
-  AgentSidebarLinks.forEach((link: AgentSidebarLink) => {
-    if (link.submenu?.some((sub) => (pathname ?? "").startsWith(sub.path))) {
-      updatedOpenMenus[link.name] = true;
-    }
-  });
+    AgentSidebarLinks.forEach((link: AgentSidebarLink) => {
+      if (link.submenu?.some((sub) => (pathname ?? "").startsWith(sub.path))) {
+        updatedOpenMenus[link.name] = true;
+      }
+    });
 
-  setOpenMenus(updatedOpenMenus);
-}, [pathname]);
+    setOpenMenus(updatedOpenMenus);
+  }, [pathname]);
 
 
   const toggleMenu = (menuName: string) => {
@@ -63,9 +63,66 @@ const Sidebar: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const email = session?.user?.email;
+
+    if (!email) return;
+
+    // 1. Fetch agent ID
+    const { data: agent, error: agentError } = await supabase
+      .from("service_agents")
+      .select("id")
+      .eq("email", email)
+      .single();
+
+    if (agentError || !agent?.id) {
+      console.error("❌ Agent not found:", agentError);
+      return;
+    }
+
+    // 2. First confirm open session exists
+    const { data: openSessions, error: sessionError } = await supabase
+      .from("agent_login_sessions")
+      .select("*")
+      .eq("agent_id", agent.id)
+      .is("logout_time", null);
+
+    if (sessionError) {
+      console.error("❌ Failed to fetch sessions:", sessionError);
+      return;
+    }
+
+    if (openSessions?.length === 0) {
+      console.log("⚠️ No open session found for this agent.");
+    } else {
+
+      const now = new Date().toISOString();
+      const { data: updatedRows, error: updateError } = await supabase
+        .from("agent_login_sessions")
+        .update({ logout_time: now })
+        .eq("agent_id", agent.id)
+        .is("logout_time", null)
+        .select(); // Forces returning updated rows
+
+      if (updateError) {
+        console.error("❌ Failed to update logout_time:", updateError.message);
+      } 
+    }
+
+    // 4. Set logged_in = false
+    await supabase
+      .from("service_agents")
+      .update({ logged_in: false })
+      .eq("email", email);
+
+    // 5. Sign out
     await signOut();
     router.push("/");
   };
+
+
+
+
 
   return (
     <div className="p-2 bg-transparent">
@@ -79,7 +136,7 @@ const Sidebar: React.FC = () => {
               <Button
                 onClick={handleLogout}
                 variant="default"
-                className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlight/80 rounded-md mt-2"
+                className="w-full text-left px-2 py-1 text-sm bg-highlight text-white hover:bg-highlightHover rounded-md mt-2"
               >
                 Logout
               </Button>
@@ -98,8 +155,8 @@ const Sidebar: React.FC = () => {
                 {link.submenu ? (
                   <div
                     className={`flex items-center justify-between gap-3 p-2 m-2 text-sm duration-150 rounded-xl transition-all cursor-pointer ${isOpen
-                        ? "bg-highlight text-black"
-                        : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
+                      ? "bg-highlight text-black"
+                      : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
                       }`}
                     onClick={() => toggleMenu(link.name)}
                   >
@@ -115,8 +172,8 @@ const Sidebar: React.FC = () => {
                   <Link href={link.path || "#"}>
                     <div
                       className={`flex items-center gap-3 p-2 m-2 text-sm duration-150 rounded-xl transition-all cursor-pointer ${pathname === link.path
-                          ? "bg-highlight text-black"
-                          : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
+                        ? "bg-highlight text-black"
+                        : "bg-transparent text-gray-300 hover:bg-highlight hover:text-black"
                         }`}
                     >
                       <Icon className="text-xl" />
@@ -134,8 +191,8 @@ const Sidebar: React.FC = () => {
                         <Link key={subLink.name} href={subLink.path}>
                           <div
                             className={` group flex items-center gap-2 p-2 m-1 text-sm rounded-lg transition-all cursor-pointer ${(pathname ?? "").replace(/\/$/, "") === subLink.path.replace(/\/$/, "")
-                                ? "bg-highlight text-black"
-                                : "bg-transparent text-white hover:bg-highlight hover:text-black"
+                              ? "bg-highlight text-black"
+                              : "bg-transparent text-white hover:bg-highlight hover:text-black"
                               }`}
                           >
                             <span className="flex items-center gap-2 capitalize">

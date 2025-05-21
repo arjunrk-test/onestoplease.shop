@@ -31,6 +31,7 @@ module.exports = {
         foreground: "var(--foreground)",
         gray: "var(--gray)",
         highlight: "var(--highlight)",
+        highlightHover: "var(--highlight-hover)",
         grayInverted: "var(--gray-inverted)"
       },
       keyframes: {

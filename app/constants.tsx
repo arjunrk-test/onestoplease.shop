@@ -70,6 +70,7 @@ export const CategoriesPath = Categories.map((category) => ({
 import { ClipboardList, } from "lucide-react";
 import { LuUsers } from "react-icons/lu";
 import { RiAdminLine } from "react-icons/ri";
+import { FiActivity } from "react-icons/fi";
 
 export const SideBarLinks = [
   {
@@ -102,6 +103,14 @@ export const SideBarLinks = [
     submenu: [
       { name: "Add Admin User", path: "/admin/add-users/add-admin", icon: RiAdminLine, },
       { name: "Add Service Agent", path: "/admin/add-users/add-service-agent", icon: LuUsers, },
+    ],
+  },
+  {
+    name: "Logs & Activity", path: "/admin/logs", icons: ClipboardList,
+    submenu: [
+      { name: "Admin login", path: "/admin/logs/admin-logs", icon: RiAdminLine },
+      { name: "Agent login", path: "/admin/logs/agent-logs", icon: LuUsers },
+      { name: "Agent activity", path: "/admin/logs/agent-activity", icon: FiActivity },
     ],
   },
   {

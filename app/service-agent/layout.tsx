@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Sidebar from "@/app/service-agent/components/Sidebar";
+import AutoLogoutTracker from "@/components/AutoLogoutTracker";
+import { logSessionStartIfNeeded } from "@/lib/api/agentSessionLogger";
 
 export default function AgentLayout({
   children,
@@ -17,36 +19,57 @@ export default function AgentLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session && pathname !== "/service-agent/login") {
-        router.push("/service-agent/login");
-        return;
-      }
+  if (!session && pathname !== "/service-agent/login") {
+    router.push("/service-agent/login");
+    return;
+  }
 
-      if (session) {
-        const { data: agentData, error: agentError } = await supabase
-          .from("service_agents")
-          .select("email")
-          .eq("email", session.user.email)
-          .single();
+  if (session) {
+  const email = session.user.email;
 
-        if (agentError || !agentData) {
-          await supabase.auth.signOut();
-          router.push("/service-agent/login");
-          return;
-        }
+  if (!email) {
+    console.error("Agent email is missing from session.");
+    await supabase.auth.signOut();
+    router.push("/service-agent/login");
+    return;
+  }
 
-        if (pathname === "/service-agent/login") {
-          router.push("/service-agent");
-          return;
-        }
+  const { data: agentData, error: agentError } = await supabase
+    .from("service_agents")
+    .select("email")
+    .eq("email", email)
+    .single();
 
-        setIsAuthorized(true);
-      }
+  if (agentError || !agentData) {
+    await supabase.auth.signOut();
+    router.push("/service-agent/login");
+    return;
+  }
 
-      setIsLoading(false);
-    };
+  const { error: updateError } = await supabase
+    .from("service_agents")
+    .update({ logged_in: true })
+    .eq("email", email);
+
+  if (updateError) {
+    console.error("❌ Failed to set logged_in: true", updateError.message);
+  }
+
+  await logSessionStartIfNeeded(email);
+
+  if (pathname === "/service-agent/login") {
+    router.push("/service-agent");
+    return;
+  }
+
+  setIsAuthorized(true);
+}
+
+  setIsLoading(false);
+};
+
 
     checkAuth();
   }, [router, pathname]);
@@ -71,6 +94,7 @@ export default function AgentLayout({
     <div className="flex h-screen bg-white">
       <Sidebar />
       <main className="flex-1 m-2 p-6 bg-black/80 text-white rounded-xl shadow-lg overflow-y-auto">
+        <AutoLogoutTracker />
         {children}
       </main>
     </div>

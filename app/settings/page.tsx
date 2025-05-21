@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
+import MobileNavbar from "@/components/MobileNavbar";
 
 export default function Settings() {
   const [firstName, setFirstName] = useState("");
@@ -25,8 +26,12 @@ export default function Settings() {
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-200">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="hidden md:block">
+        <Navbar />
+      </div>
+      <div className="md:hidden">
+        <MobileNavbar />
+      </div>      <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-semibold mb-8 uppercase">Settings</h1>
 
         <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -93,14 +98,14 @@ export default function Settings() {
               <Button
                 variant="default"
                 onClick={addNewAddress}
-                className="w-full bg-highlight hover:bg-highlight/80"
+                className="w-full bg-highlight hover:bg-highlightHover"
               >
                 Add New Address
               </Button>
             </div>
 
             <div className="space-y-4">
-              <Button onClick={handleSave} className="w-full bg-highlight hover:bg-highlight/80">
+              <Button onClick={handleSave} className="w-full bg-highlight hover:bg-highlightHover">
                 Save Changes
               </Button>
             </div>

@@ -17,6 +17,7 @@ import FormSelect from "./FormSelect";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import MobileNavbar from "@/components/MobileNavbar";
 
 type ContributeForm = {
   fullName: string;
@@ -41,7 +42,7 @@ export default function Contribute() {
   const openLogin = useLoginDialog((state) => state.open);
   const [hydrated, setHydrated] = useState(false);
   const [pincodeWarning, setPincodeWarning] = useState("");
-  const [locationLinkWarning, setLocationLinkWarning] = useState(""); 
+  const [locationLinkWarning, setLocationLinkWarning] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
 
@@ -226,8 +227,12 @@ export default function Contribute() {
   return (
 
     <>
-      <Navbar />
-      <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
+      <div className="hidden md:block">
+        <Navbar />
+      </div>
+      <div className="md:hidden">
+        <MobileNavbar />
+      </div>      <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
         <OtpLoginDialog />
 
         {!hydrated ? (
@@ -329,7 +334,7 @@ export default function Contribute() {
               <div className="md:col-span-2 text-center">
                 <Button
                   type="button"
-                  className="px-6 py-3 text-base bg-highlight hover:bg-highlight/80"
+                  className="px-6 py-3 text-base bg-highlight hover:bg-highlightHover"
                   onClick={() => {
                     const requiredFields = [
                       form.fullName,

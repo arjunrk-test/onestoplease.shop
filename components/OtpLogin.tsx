@@ -116,7 +116,7 @@ export default function OtpLogin({ closeDialog }: Props) {
       <Button
         onClick={sendOtp}
         disabled={!phoneNumber || isPending || resendCountdown > 0}
-        className="mt-5 w-full bg-highlight hover:bg-highlight/80 disabled:cursor-not-allowed"
+        className="mt-5 w-full bg-highlight hover:bg-highlightHover disabled:cursor-not-allowed"
       >
         {resendCountdown > 0
           ? `Resend OTP in ${resendCountdown}s`

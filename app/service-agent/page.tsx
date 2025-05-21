@@ -12,7 +12,7 @@ interface AgentCategiories {
 
 const AgentCategiories = [
   { name: "All Contributions", path: "/service-agent/all-contributions", icon: BsBoxSeam, description: "List of all contributions done by the user" },
-  { name: "Unassigned", path: "/service-agent/unassigned-contributions", icon: FiInbox, description: "List of unassigned contributions" },
+  { name: "Pending", path: "/service-agent/pending-contributions", icon: FiInbox, description: "List of pending contributions" },
   { name: "Assigned", path: "/service-agent/assigned-contributions", icon: FiUserCheck, description: "List of assigned contributions to " },
   { name: "Approved", path: "/service-agent/approved-contributions", icon: FiCheckCircle, description: "List of approved contrbutions by " },
   { name: "Rejected", path: "/service-agent/rejected-contributions", icon: FiXCircle, description: "List of rejected contributions by " },
