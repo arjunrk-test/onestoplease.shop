@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
+import { logAgentAction } from "@/lib/logServiceAgents";
 
 interface Contribution {
    id: string;
@@ -21,10 +22,10 @@ interface Contribution {
    contribution_type: string;
 }
 
-export default function UnassignedContributionsPage() {
+export default function PendingContributionsPage() {
    const [contributions, setContributions] = useState<Contribution[]>([]);
    const [loading, setLoading] = useState(true);
-   const fetchUnassignedContributions = async () => {
+   const fetchPendingContributions = async () => {
       setLoading(true);
       const { data, error } = await supabase
          .from("contributions")
@@ -42,54 +43,67 @@ export default function UnassignedContributionsPage() {
    };
 
    const handleAssignToMe = async (contributionId: string) => {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+      const {
+         data: { user },
+         error: userError,
+      } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    console.error("User not authenticated");
-    return;
-  }
+      if (userError || !user) {
+         console.error("User not authenticated");
+         return;
+      }
 
-  const { data: agent, error: agentError } = await supabase
-    .from("service_agents")
-    .select("name")
-    .eq("email", user.email)
-    .single();
+      const { data: agent, error: agentError } = await supabase
+         .from("service_agents")
+         .select("name, id")
+         .eq("email", user.email)
+         .single();
 
-  if (agentError || !agent) {
-    console.error("Agent not found");
-    return;
-  }
+      if (agentError || !agent) {
+         console.error("Agent not found");
+         return;
+      }
 
-  const { error } = await supabase
-  .from("contributions")
-  .update({
-    assigned_to: agent.name,
-    status: "assigned",
-  })
-  .eq("id", contributionId);
+      const { error } = await supabase
+         .from("contributions")
+         .update({
+            assigned_to: agent.name,
+            status: "assigned",
+         })
+         .eq("id", contributionId);
 
+      if (error) {
+         console.error("Failed to assign contribution:", error.message);
+      } else {
 
-  if (error) {
-    console.error("Failed to assign contribution:", error.message);
-  } else {
-    fetchUnassignedContributions();
-  }
-};
+         if (!user.email) {
+            console.error("Email is missing from user object");
+            return;
+         }
+
+         await logAgentAction({
+            agentId: agent.id,
+            agentEmail: user.email!,
+            action: `Assigned contribution #${contributionId} to self`,
+            metadata: { contributionId },
+         });
+
+         fetchPendingContributions();
+      }
+   };
+
 
    useEffect(() => {
-      fetchUnassignedContributions();
+      fetchPendingContributions();
    }, []);
 
    return (
       <div>
-         <h1 className="text-2xl font-bold mb-6">Unassigned Contributions</h1>
+         <h1 className="text-2xl font-bold mb-6">Pending Contributions</h1>
          {loading ? (
             <div className="text-center text-muted">Loading...</div>
          ) : contributions.length === 0 ? (
-            <div className="text-center text-muted">No unassigned contributions found.</div>
+            <div className="text-center text-muted">No pending contributions found.</div>
          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                {contributions.map((contribution) => (

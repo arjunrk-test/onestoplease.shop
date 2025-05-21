@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { logAgentAction } from "@/lib/logServiceAgents";
 
 interface Contribution {
    id: string;
@@ -32,78 +33,90 @@ export default function AssignedContributionsPage() {
 
 
    const fetchAssignedContributions = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    setLoading(false);
-    return;
-  }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+         setLoading(false);
+         return;
+      }
 
-  const { data: agent, error: agentError } = await supabase
-    .from("service_agents")
-    .select("name")
-    .eq("email", user.email)
-    .single();
+      const { data: agent, error: agentError } = await supabase
+         .from("service_agents")
+         .select("name")
+         .eq("email", user.email)
+         .single();
 
-  if (agentError || !agent) {
-    console.error("Agent not found");
-    setLoading(false);
-    return;
-  }
+      if (agentError || !agent) {
+         console.error("Agent not found");
+         setLoading(false);
+         return;
+      }
 
-  const { data, error } = await supabase
-    .from("contributions")
-    .select("*")
-    .eq("assigned_to", agent.name)
-    .eq("status", "assigned")
-    .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+         .from("contributions")
+         .select("*")
+         .eq("assigned_to", agent.name)
+         .eq("status", "assigned")
+         .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching assigned contributions:", error.message);
-  } else {
-    setContributions(data || []);
-  }
+      if (error) {
+         console.error("Error fetching assigned contributions:", error.message);
+      } else {
+         setContributions(data || []);
+      }
 
-  setLoading(false);
-};
+      setLoading(false);
+   };
 
-const handleUnassign = async (contributionId: string) => {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    console.error("Not authenticated");
-    return;
-  }
+   const handleUnassign = async (contributionId: string) => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+         console.error("Not authenticated");
+         return;
+      }
 
-  const { data: agent, error: agentError } = await supabase
-    .from("service_agents")
-    .select("name")
-    .eq("email", user.email)
-    .single();
+      const { data: agent, error: agentError } = await supabase
+         .from("service_agents")
+         .select("name, id")
+         .eq("email", user.email)
+         .single();
 
-  if (agentError || !agent) {
-    console.error("Agent not found");
-    return;
-  }
+      if (agentError || !agent) {
+         console.error("Agent not found");
+         return;
+      }
 
-  const { error } = await supabase
-  .from("contributions")
-  .update({
-    assigned_to: null,
-    status: "pending",
-  })
-  .eq("id", contributionId)
-  .eq("assigned_to", agent.name);
+      const { error } = await supabase
+         .from("contributions")
+         .update({
+            assigned_to: null,
+            status: "pending",
+         })
+         .eq("id", contributionId)
+         .eq("assigned_to", agent.name);
 
 
-  if (error) {
-    console.error("Failed to unassign:", error.message);
-  } else {
-    fetchAssignedContributions();
-  }
-};
+      if (error) {
+         console.error("Failed to unassign:", error.message);
+      } else {
+         if (!user.email) {
+            console.error("Email is missing from user object");
+            return;
+         }
 
-useEffect(() => {
-  fetchAssignedContributions();
-}, []);
+         await logAgentAction({
+            agentId: agent.id,
+            agentEmail: user.email,
+            action: `Unassigned contribution #${contributionId}`,
+            metadata: { contributionId },
+         });
+
+         fetchAssignedContributions();
+      }
+   };
+
+   useEffect(() => {
+      fetchAssignedContributions();
+   }, []);
 
 
    return (
@@ -182,6 +195,29 @@ useEffect(() => {
                      <Button
                         className="bg-green-600 hover:bg-green-700 text-white"
                         onClick={async () => {
+                           if (!approveTarget) return;
+
+                           const {
+                              data: { user },
+                              error: userError,
+                           } = await supabase.auth.getUser();
+
+                           if (userError || !user) {
+                              toast.error("User not authenticated");
+                              return;
+                           }
+
+                           const { data: agent, error: agentError } = await supabase
+                              .from("service_agents")
+                              .select("id, name")
+                              .eq("email", user.email)
+                              .single();
+
+                           if (agentError || !agent) {
+                              toast.error("Agent not found");
+                              return;
+                           }
+
                            const { error } = await supabase
                               .from("contributions")
                               .update({ status: "approved" })
@@ -190,14 +226,23 @@ useEffect(() => {
                            if (error) {
                               toast.error("Failed to approve.");
                            } else {
+                              await logAgentAction({
+                                 agentId: agent.id,
+                                 agentEmail: user.email!,
+                                 action: `Approved contribution #${approveTarget.id}`,
+                                 metadata: { contributionId: approveTarget.id },
+                              });
+
                               toast.success("Contribution approved.");
                               fetchAssignedContributions();
                            }
+
                            setApproveTarget(null);
                         }}
                      >
                         Yes, Approve
                      </Button>
+
                   </div>
                </div>
             </div>
@@ -234,18 +279,50 @@ useEffect(() => {
                         disabled={!rejectionReason}
                         className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={async () => {
+                           if (!rejectTarget) return;
+
+                           const {
+                              data: { user },
+                              error: userError,
+                           } = await supabase.auth.getUser();
+
+                           if (userError || !user) {
+                              toast.error("User not authenticated");
+                              return;
+                           }
+
+                           const { data: agent, error: agentError } = await supabase
+                              .from("service_agents")
+                              .select("id, name")
+                              .eq("email", user.email)
+                              .single();
+
+                           if (agentError || !agent) {
+                              toast.error("Agent not found");
+                              return;
+                           }
+
                            const { error } = await supabase
                               .from("contributions")
                               .update({
                                  status: "rejected",
-                                 rejection_reason: rejectionReason
+                                 rejection_reason: rejectionReason,
                               })
-
                               .eq("id", rejectTarget.id);
 
                            if (error) {
                               toast.error("Failed to reject.");
                            } else {
+                              await logAgentAction({
+                                 agentId: agent.id,
+                                 agentEmail: user.email!,
+                                 action: `Rejected contribution #${rejectTarget.id} with reason: "${rejectionReason}"`,
+                                 metadata: {
+                                    contributionId: rejectTarget.id,
+                                    rejectionReason,
+                                 },
+                              });
+
                               toast.success("Contribution rejected.");
                               fetchAssignedContributions();
                            }
@@ -256,6 +333,7 @@ useEffect(() => {
                      >
                         Confirm Reject
                      </Button>
+
                   </div>
                </div>
             </div>
