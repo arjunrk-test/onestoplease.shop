@@ -23,9 +23,12 @@ export default function Navbar() {
   const { role, loading } = useUserRole();
 
   return (
-    <nav className="w-full sticky top-0 px-48 py-2 bg-gray shadow-sm flex items-center justify-between gap-6">
+    <nav className="w-full sticky top-0 px-24 py-1 bg-gray shadow-sm flex items-center justify-between gap-6">
       {/* Logo */}
-      <Link href="/" className="flex items-center text-2xl font-bold text-highlight">
+      <Link
+        href="/"
+        className="flex items-center gap-0 text-highlight"
+      >
         <Image
           src="/logo.png"
           alt="OneStopLease Logo"
@@ -33,15 +36,14 @@ export default function Navbar() {
           height={56}
           className="rounded"
         />
-        <span>OneStopLease</span>
+        <span className=" text-2xl font-bold">OneStopLease</span>
       </Link>
-
 
       {/* Location Dropdown */}
       <select
         value={location}
         onChange={(e) => setLocation(e.target.value)}
-        className="border border-highlight px-3 py-1 focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-md text-sm h-8 w-48"
+        className="border lg:w-36 bg-white border-highlight px-3 py-1 focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-md text-sm h-8 w-48"
       >
         {Locations.map((loc) => (
           <option key={loc} value={loc}>
@@ -62,14 +64,12 @@ export default function Navbar() {
 
       {/* Cart Button */}
       <Link href="/cart" className="relative">
-        <Button variant="default" size="icon" className="relative bg-white h-8">
-          <IoIosCart className="text-2xl text-highlight" />
-          {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
-              {totalItems}
-            </span>
-          )}
-        </Button>
+        <IoIosCart className="text-2xl text-highlight" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
+                        {totalItems}
+                      </span>
+                    )}
       </Link>
 
       {/* Auth Button / Profile */}
