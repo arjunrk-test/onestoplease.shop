@@ -17,10 +17,10 @@ export default function MobilePagesNav() {
   };
 
   return (
-    <div className="bg-background sticky top-[64px] z-10 px-4 py-3 shadow-sm">
+    <div className="bg-background sticky top-[108px] z-10 px-4 py-3 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Breadcrumb */}
-        <nav className="text-xs text-highlight truncate">
+        <nav className="text-sm text-highlight truncate">
           <span
             className="cursor-pointer"
             onClick={() => {

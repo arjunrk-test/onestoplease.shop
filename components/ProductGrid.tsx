@@ -45,7 +45,7 @@ export default function ProductGrid({ category, subcategories }: Props) {
   }, [category, subcategories]);
 
   return (
-    <Tabs defaultValue={subcategories[0].key} className="w-full mt-8">
+    <Tabs defaultValue={subcategories[0].key} className="w-full mt-8 sticky top-[224px] z-10">
 
       <TabsList className="flex w-full flex-wrap justify-start gap-2 bg-highlight  rounded-md">
         {subcategories.map(({ key, label }) => (
