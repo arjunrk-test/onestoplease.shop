@@ -228,12 +228,7 @@ export default function Contribute() {
   return (
 
     <>
-      <div className="hidden md:block">
-        <Navbar />
-      </div>
-      <div className="md:hidden">
-        <MobileNavbar />
-      </div>      
+      {isMobile ? <MobileNavbar /> : <Navbar />}      
       <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
         {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
         {!hydrated ? (

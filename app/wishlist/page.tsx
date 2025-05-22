@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import MobileNavbar from "@/components/MobileNavbar";
+import useIsMobile from "@/hooks/useIsMobile";
 
 interface Product {
    id: string;
@@ -21,6 +22,7 @@ export default function WishlistPage() {
    const router = useRouter();
    const [wishlist, setWishlist] = useState<Product[]>([]);
    const [loading, setLoading] = useState(true);
+   const isMobile = useIsMobile();
 
    useEffect(() => {
       // 1. Delay until hydration is complete
@@ -75,12 +77,8 @@ export default function WishlistPage() {
 
    return (
       <main className="min-h-screen flex flex-col bg-background">
-         <div className="hidden md:block">
-            <Navbar />
-         </div>
-         <div className="md:hidden">
-            <MobileNavbar />
-         </div>         <div className="container mx-auto px-6 py-10">
+         {isMobile ? <MobileNavbar /> : <Navbar />}
+         <div className="container mx-auto px-6 py-10">
             <h1 className="text-3xl font-bold mb-6 text-foreground">Your Wishlist</h1>
 
             {loading ? (

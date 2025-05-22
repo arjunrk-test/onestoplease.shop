@@ -114,12 +114,7 @@ export default function ViewContributions() {
 
    return (
       <>
-         <div className="hidden md:block">
-            <Navbar />
-         </div>
-         <div className="md:hidden">
-            <MobileNavbar />
-         </div>         
+         {isMobile ? <MobileNavbar /> : <Navbar />}        
          <main className="min-h-[calc(100vh-66px)] bg-background text-foreground p-6">
             {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
             {!hydrated ? (

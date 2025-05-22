@@ -7,21 +7,18 @@ import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import Spinner from "@/components/Spinner";
 import MobileNavbar from "@/components/MobileNavbar";
-
+import useIsMobile from "@/hooks/useIsMobile";
 
 export default function CartPage() {
    const { items, removeFromCart, clearCart, addToCart, hasHydrated } = useCartStore();
    const router = useRouter();
+   const isMobile = useIsMobile();
 
    if (!hasHydrated) {
       return (
          <main className="min-h-screen flex flex-col bg-gray">
-            <div className="hidden md:block">
-               <Navbar />
-            </div>
-            <div className="md:hidden">
-               <MobileNavbar />
-            </div>            <div className="flex-1 flex items-center justify-center">
+            {isMobile ? <MobileNavbar /> : <Navbar />}
+            <div className="flex-1 flex items-center justify-center">
                <Spinner />
             </div>
          </main>
@@ -36,12 +33,8 @@ export default function CartPage() {
    if (items.length === 0) {
       return (
          <main className="min-h-screen flex flex-col bg-gray">
-            <div className="hidden md:block">
-               <Navbar />
-            </div>
-            <div className="md:hidden">
-               <MobileNavbar />
-            </div>            <div className="flex flex-col items-center justify-center flex-1 text-center p-6 bg-background text-foreground">
+            {isMobile ? <MobileNavbar /> : <Navbar />}
+            <div className="flex flex-col items-center justify-center flex-1 text-center p-6 bg-background text-foreground">
                <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
                <Button onClick={() => router.push("/products")} className="bg-highlight hover:bg-highlightHover">
                   Continue Shopping
@@ -53,12 +46,8 @@ export default function CartPage() {
 
    return (
       <main className="min-h-screen flex flex-col bg-gray">
-         <div className="hidden md:block">
-            <Navbar />
-         </div>
-         <div className="md:hidden">
-            <MobileNavbar />
-         </div>         <div className="px-6 py-10 max-w-6xl mx-auto w-full bg-background">
+         {isMobile ? <MobileNavbar /> : <Navbar />}
+         <div className="px-6 py-10 max-w-6xl mx-auto w-full bg-background">
             <h1 className="text-3xl font-bold mb-6 text-foreground">Your Cart</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
