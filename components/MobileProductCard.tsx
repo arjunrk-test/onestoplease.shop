@@ -88,8 +88,8 @@ export default function MobileProductCard({ product }: { product: Product }) {
          />
 
          <div className="text-sm text-center">
-            <h3 className="font-medium text-foreground">{product.name}</h3>
-            <p className="text-muted-foreground">₹{product.price} / month</p>
+            <h3 className="font-medium text-black">{product.name}</h3>
+            <p className="text-black">₹{product.price} / month</p>
          </div>
 
          <div className="flex justify-between items-center gap-2">

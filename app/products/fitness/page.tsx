@@ -53,7 +53,7 @@ export default function Fitness() {
                       onClick={() => setSelected(key)}
                       className={`px-4 py-1.5 rounded-full text-sm border transition ${selected === key
                           ? "bg-highlight text-white border-highlight"
-                          : "bg-white text-foreground border-gray-300"
+                          : "bg-white text-black border-gray-300"
                         }`}
                     >
                       {label}
