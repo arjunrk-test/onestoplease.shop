@@ -1,10 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { IoIosCart } from "react-icons/io";
-import { FiUser } from "react-icons/fi";
+import { FaDoorClosed } from "react-icons/fa";
 import { useCartStore } from "@/lib/cartStore";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { useLoginDialog } from "@/hooks/useLoginDialog";
@@ -12,13 +11,19 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Locations } from "@/app/constants";
 import { Input } from "./ui/input";
 import ThemeToggle from "./ThemeToogle";
-import ProfileDropdown from "./ProfileDropdown";
 import OtpLoginDialog from "./OtpLoginDialog";
+import MobileOtpLoginDialog from "./MobileOtpLoginDialog";
+import ProfileDropdown from "./ProfileDropdown";
+import useIsMobile from "@/hooks/useIsMobile";
 
 export default function MobileNavbar() {
   const [location, setLocation] = useState("Chennai");
+  const isMobile = useIsMobile();
+
+
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+
   const { user } = useSupabaseUser();
   const openLogin = useLoginDialog((state) => state.open);
   const { role, loading } = useUserRole();
@@ -52,8 +57,8 @@ export default function MobileNavbar() {
           </select>
         </div>
 
-        {/* Right: Theme, Cart, Login */}
-        <div className="flex items-center gap-3">
+        {/* Right: Theme, Cart, Profile/Login */}
+        <div className="flex items-center gap-4">
           <div className="scale-90">
             <ThemeToggle />
           </div>
@@ -68,15 +73,16 @@ export default function MobileNavbar() {
             )}
           </Link>
 
-          {/* Login/Profile */}
+          {/* Auth / Profile */}
           {user && role === "user" && !loading ? (
-            <ProfileDropdown />
+            <ProfileDropdown type="mobile" />
           ) : (
-            <FiUser
-              className="text-2xl text-highlight cursor-pointer"
+            <FaDoorClosed
+              className="flex items-center ml-2 mr-2 focus:ring-0 focus:outline-none focus-visible:ring-0 text-2xl text-highlight cursor-pointer"
               onClick={() => openLogin()}
             />
           )}
+
         </div>
       </div>
 
@@ -87,7 +93,10 @@ export default function MobileNavbar() {
         className="border border-highlight bg-white h-9 px-3 py-1 text-sm rounded-md w-full"
       />
 
-      <OtpLoginDialog />
+      {/* Login Dialogs */}
+      <>
+        {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
+      </>
     </nav>
   );
 }

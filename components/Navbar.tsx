@@ -13,8 +13,11 @@ import { useCartStore } from "@/lib/cartStore";
 import { useLoginDialog } from "@/hooks/useLoginDialog";
 import { useUserRole } from "@/hooks/useUserRole";
 import Image from "next/image";
+import MobileOtpLoginDialog from "./MobileOtpLoginDialog";
+import useIsMobile from "@/hooks/useIsMobile";
 
 export default function Navbar() {
+  const isMobile = useIsMobile();
   const [location, setLocation] = useState("Chennai");
   const { user } = useSupabaseUser();
   const items = useCartStore((state) => state.items);
@@ -65,11 +68,11 @@ export default function Navbar() {
       {/* Cart Button */}
       <Link href="/cart" className="relative">
         <IoIosCart className="text-2xl text-highlight" />
-                    {totalItems > 0 && (
-                      <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
-                        {totalItems}
-                      </span>
-                    )}
+        {totalItems > 0 && (
+          <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5 py-0.5">
+            {totalItems}
+          </span>
+        )}
       </Link>
 
       {/* Auth Button / Profile */}
@@ -86,7 +89,8 @@ export default function Navbar() {
       )}
 
       {/* Only one shared dialog instance at the bottom */}
-      <OtpLoginDialog />
+      {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
+
     </nav>
   );
 }

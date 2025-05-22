@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
 import { useLoginDialog } from "@/hooks/useLoginDialog";
@@ -18,6 +17,8 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import MobileNavbar from "@/components/MobileNavbar";
+import MobileOtpLoginDialog from "@/components/MobileOtpLoginDialog";
+import useIsMobile from "@/hooks/useIsMobile";
 
 type ContributeForm = {
   fullName: string;
@@ -44,7 +45,7 @@ export default function Contribute() {
   const [pincodeWarning, setPincodeWarning] = useState("");
   const [locationLinkWarning, setLocationLinkWarning] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-
+  const isMobile = useIsMobile();
 
   const [form, setForm] = useState<ContributeForm>({
     fullName: "",
@@ -232,9 +233,9 @@ export default function Contribute() {
       </div>
       <div className="md:hidden">
         <MobileNavbar />
-      </div>      <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
-        <OtpLoginDialog />
-
+      </div>      
+      <main className="min-h-[calc(100vh-66px)] p-6 bg-background text-foreground">
+        {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
         {!hydrated ? (
           <div className="flex items-center justify-center h-48">
             <Spinner />
