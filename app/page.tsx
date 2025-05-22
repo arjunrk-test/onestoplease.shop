@@ -4,16 +4,14 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Categories } from "./constants";
 import MobileNavbar from "@/components/MobileNavbar";
+import useIsMobile from "@/hooks/useIsMobile";
 
 export default function Home() {
+  const isMobile = useIsMobile();
+
   return (
     <main className="min-h-screen flex flex-col bg-gray">
-      <div className="hidden md:block">
-        <Navbar />
-      </div>
-      <div className="md:hidden">
-        <MobileNavbar />
-      </div>
+      {isMobile ? <MobileNavbar /> : <Navbar />}
       {/* Hero Section */}
       <section className="w-full px-6 py-10 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">

@@ -3,11 +3,16 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { CiLogout } from "react-icons/ci";
+import { FaDoorOpen } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfileList } from "@/app/constants";
 
-const ProfileDropdown = () => {
+type Props = {
+  type?: "desktop" | "mobile";
+};
+
+const ProfileDropdown = ({ type = "desktop" }: Props) => {
   const { user, signOut } = useAuth();
 
   return (
@@ -15,15 +20,25 @@ const ProfileDropdown = () => {
       {user ? (
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <Button
-              variant="default"
-              className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlightHover"
-            >
-              Profile <ChevronDown className="w-4 h-4" />
-            </Button>
+            {type === "mobile" ? (
+              <Button
+                variant="default"
+                className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0"
+              >
+                <FaDoorOpen className="!w-6 !h-6 text-highlight" />
+              </Button>
+            ) : (
+
+              <Button
+                variant="default"
+                className="flex items-center gap-2 focus:ring-0 focus:outline-none focus-visible:ring-0 bg-highlight h-8 text-white hover:bg-highlightHover"
+              >
+                Profile <ChevronDown className="w-4 h-4" />
+              </Button>
+
+            )}
           </DropdownMenu.Trigger>
 
-          {/* Make sure it's wrapped in Portal with high z-index */}
           <DropdownMenu.Portal>
             <DropdownMenu.Content
               sideOffset={8}

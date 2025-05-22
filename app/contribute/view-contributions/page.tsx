@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useSupabaseUser } from "@/hooks/useSupabaseUser";
@@ -16,6 +15,8 @@ import OtpLoginDialog from "@/components/OtpLoginDialog";
 import Spinner from "@/components/Spinner";
 import { FaDotCircle } from "react-icons/fa";
 import MobileNavbar from "@/components/MobileNavbar";
+import MobileOtpLoginDialog from "@/components/MobileOtpLoginDialog";
+import useIsMobile from "@/hooks/useIsMobile";
 
 type Contribution = {
    id: string;
@@ -43,6 +44,7 @@ type Contribution = {
 };
 
 export default function ViewContributions() {
+   const isMobile = useIsMobile();
    const { user, isAuthReady } = useSupabaseUser();
    const openLogin = useLoginDialog((state) => state.open);
    const [hydrated, setHydrated] = useState(false);
@@ -67,16 +69,9 @@ export default function ViewContributions() {
 
          const { data, error } = await supabase
             .from("contributions")
-            .select(`
-    *,
-    service_agents (
-      name,
-      phone
-    )
-  `)
+            .select(`*, service_agents (name,phone)`)
             .eq("user_id", user.id)
             .order("created_at", { ascending: false });
-
 
          if (error) {
             toast.error("Failed to load contributions.");
@@ -119,13 +114,9 @@ export default function ViewContributions() {
 
    return (
       <>
-         <div className="hidden md:block">
-            <Navbar />
-         </div>
-         <div className="md:hidden">
-            <MobileNavbar />
-         </div>         <main className="min-h-[calc(100vh-66px)] bg-background text-foreground p-6">
-            <OtpLoginDialog />
+         {isMobile ? <MobileNavbar /> : <Navbar />}        
+         <main className="min-h-[calc(100vh-66px)] bg-background text-foreground p-6">
+            {isMobile ? <MobileOtpLoginDialog /> : <OtpLoginDialog />}
             {!hydrated ? (
                <div className="flex items-center justify-center h-48">
                   <Spinner />
