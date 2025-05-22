@@ -5,6 +5,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import MobileNavbar from "@/components/MobileNavbar";
 import useIsMobile from "@/hooks/useIsMobile";
+import MobilePagesNav from "@/components/MobilePagesNav";
 
 export default function ProductsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,7 +15,7 @@ export default function ProductsLayout({ children }: { children: React.ReactNode
   return (
     <div className="flex flex-col min-h-screen">
       {isMobile ? <MobileNavbar /> : <Navbar />}
-      {!hidePagesNav && <PagesNav />}
+      {!hidePagesNav && (isMobile ? <MobilePagesNav /> : <PagesNav />)}
       <main className="flex-1">{children}</main>
     </div>
   );
