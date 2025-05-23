@@ -46,7 +46,7 @@ export default function Furniture() {
             </div>
 
             {/* Scrollable Pills */}
-            <div className="overflow-x-auto scrollbar-hide px-1">
+            <div className="overflow-x-auto px-1 no-scroll">
               <div className="flex gap-2 min-w-max">
                 {subcategories.map(({ key, label }) => (
                   <Button
