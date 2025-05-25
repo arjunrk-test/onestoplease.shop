@@ -108,10 +108,10 @@ export default function AllContributionsPage() {
             <h1 className="text-2xl font-bold text-highlight">All Contributions</h1>
 
             <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val as StatusType)}>
-               <SelectTrigger className="w-[220px] bg-background text-foreground text-sm border-none">
+               <SelectTrigger className="w-[220px] bg-gray text-foreground text-sm border-none">
                   <SelectValue placeholder="Filter by status" />
                </SelectTrigger>
-               <SelectContent className="bg-background text-sm text-foreground border-none">
+               <SelectContent className="bg-gray text-sm text-foreground border-none">
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="all">All ({counts.all})</SelectItem>
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="pending">Pending ({counts.pending})</SelectItem>
                   <SelectItem className="focus:bg-highlight text-sm border-none" value="assigned">Assigned ({counts.assigned})</SelectItem>
@@ -122,30 +122,30 @@ export default function AllContributionsPage() {
          </div>
 
          {loading ? (
-            <div className="text-center text-muted">Loading contributions...</div>
+            <div className="text-center text-foreground">Loading contributions...</div>
          ) : contributions.length === 0 ? (
-            <div className="text-center text-muted">No contributions found.</div>
+            <div className="text-center text-foreground">No contributions found.</div>
          ) : (
             <>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {contributions.map((contribution) => (
                      <div
                         key={contribution.id}
-                        className="bg-background text-foreground rounded-lg shadow-md p-4 flex flex-col justify-between"
+                        className="bg-gray text-foreground rounded-lg shadow-grayInverted shadow-sm p-4 flex flex-col justify-between "
                      >
                         <div>
                            <h2 className="text-lg text-highlight capitalize font-semibold mb-2">{contribution.product_name}</h2>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">By:</strong> {contribution.full_name}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">By:</strong> {contribution.full_name}
                            </p>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">Phone:</strong> {"+" + contribution.phone_number}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Phone:</strong> {"+" + contribution.phone_number}
                            </p>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">Address:</strong> {contribution.address}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Address:</strong> {contribution.address}
                            </p>
                            <p className="text-sm text-muted mb-2 flex items-center gap-2">
-                              <strong className="text-accent text-sm">Status:</strong>
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Status:</strong>
                               <FaDotCircle
                                  className={
                                     contribution.status === "approved"

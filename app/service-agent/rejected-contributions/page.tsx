@@ -56,22 +56,22 @@ useEffect(() => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Rejected Contributions</h1>
+      <h1 className="text-2xl text-highlight font-bold mb-6">Rejected Contributions</h1>
 
       {loading ? (
-        <p className="text-muted text-center">Loading...</p>
+        <p className="text-foreground text-center">Loading...</p>
       ) : contributions.length === 0 ? (
-        <p className="text-muted text-center">No rejected contributions yet.</p>
+        <p className="text-foreground text-center">No rejected contributions yet.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {contributions.map((c) => (
-            <div key={c.id} className="bg-background text-foreground rounded-lg shadow p-4">
+            <div key={c.id} className="bg-gray shadow-grayInverted text-foreground rounded-lg shadow-sm p-4">
               <h2 className="text-lg font-semibold text-highlight mb-2 capitalize">{c.product_name}</h2>
-              <p className="text-sm"><strong className="text-accent text-sm">By:</strong> {c.full_name}</p>
-              <p className="text-sm"><strong className="text-accent text-sm">Phone:</strong> {c.phone_number}</p>
-              <p className="text-sm"><strong className="text-accent text-sm">Address:</strong> {c.address}</p>
-              <p className="text-sm"><strong className="text-accent text-sm">Type:</strong> {c.contribution_type}</p>
-              <p className="text-sm"><strong className="text-accent text-sm">Description:</strong> {c.description}</p>
+              <p className="text-sm"><strong className="dark:text-blue-500 text-[#4F16F0] text-sm">By:</strong> {c.full_name}</p>
+              <p className="text-sm"><strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Phone:</strong> {c.phone_number}</p>
+              <p className="text-sm"><strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Address:</strong> {c.address}</p>
+              <p className="text-sm"><strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Type:</strong> {c.contribution_type}</p>
+              <p className="text-sm"><strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Description:</strong> {c.description}</p>
               <p className="text-sm text-red-500 mt-2">
                 <strong>Rejection Reason:</strong> {c.rejection_reason || "Not provided"}
               </p>

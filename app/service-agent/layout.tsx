@@ -91,9 +91,9 @@ export default function AgentLayout({
   }
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-foreground">
       <Sidebar />
-      <main className="flex-1 m-2 p-6 bg-black/80 text-white rounded-xl shadow-lg overflow-y-auto">
+      <main className="flex-1 m-2 p-6 bg-background text-white rounded-lg shadow-lg overflow-y-auto">
         <AutoLogoutTracker />
         {children}
       </main>
