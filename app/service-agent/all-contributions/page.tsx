@@ -6,6 +6,7 @@ import { Select } from "@/components/ui/select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { FaDotCircle } from "react-icons/fa";
+import { Badge } from "@/components/ui/badge";
 
 type StatusType = "all" | "pending" | "assigned" | "approved" | "rejected";
 
@@ -108,44 +109,54 @@ export default function AllContributionsPage() {
             <h1 className="text-2xl font-bold text-highlight">All Contributions</h1>
 
             <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val as StatusType)}>
-               <SelectTrigger className="w-[220px] bg-background text-foreground text-sm border-none">
+               <SelectTrigger className="w-[220px] bg-gray text-foreground text-sm border-none">
                   <SelectValue placeholder="Filter by status" />
                </SelectTrigger>
-               <SelectContent className="bg-background text-sm text-foreground border-none">
-                  <SelectItem className="focus:bg-highlight text-sm border-none" value="all">All ({counts.all})</SelectItem>
-                  <SelectItem className="focus:bg-highlight text-sm border-none" value="pending">Pending ({counts.pending})</SelectItem>
-                  <SelectItem className="focus:bg-highlight text-sm border-none" value="assigned">Assigned ({counts.assigned})</SelectItem>
-                  <SelectItem className="focus:bg-highlight text-sm border-none" value="approved">Approved ({counts.approved})</SelectItem>
-                  <SelectItem className="focus:bg-highlight text-sm border-none" value="rejected">Rejected ({counts.rejected})</SelectItem>
+               <SelectContent className="bg-gray text-sm text-foreground border-none">
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="all">All
+                     <Badge variant="default" className="ml-2 bg-[#FF2DF1]  h-5 w-8 text-foreground">{counts.all}</Badge>
+                  </SelectItem>
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="pending">Pending
+                     <Badge variant="default" className="ml-2 bg-yellow-500  h-5 w-8 text-foreground">{counts.pending}</Badge>
+                  </SelectItem>
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="assigned">Assigned
+                     <Badge variant="default" className="ml-2 bg-blue-500  h-5 w-8 text-foreground">{counts.assigned}</Badge>
+                  </SelectItem>
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="approved">Approved
+                     <Badge variant="default" className="ml-2 bg-green-500  h-5 w-8 text-foreground">{counts.approved}</Badge>
+                  </SelectItem>
+                  <SelectItem className="focus:bg-highlight text-sm border-none" value="rejected">Rejected
+                     <Badge variant="default" className="ml-2 bg-red-500  h-5 w-8 text-foreground">{counts.rejected}</Badge>
+                  </SelectItem>
                </SelectContent>
             </Select>
          </div>
 
          {loading ? (
-            <div className="text-center text-muted">Loading contributions...</div>
+            <div className="text-center text-foreground">Loading contributions...</div>
          ) : contributions.length === 0 ? (
-            <div className="text-center text-muted">No contributions found.</div>
+            <div className="text-center text-foreground">No contributions found.</div>
          ) : (
             <>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {contributions.map((contribution) => (
                      <div
                         key={contribution.id}
-                        className="bg-background text-foreground rounded-lg shadow-md p-4 flex flex-col justify-between"
+                        className="bg-gray text-foreground rounded-lg shadow-grayInverted shadow-sm p-4 flex flex-col justify-between "
                      >
                         <div>
                            <h2 className="text-lg text-highlight capitalize font-semibold mb-2">{contribution.product_name}</h2>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">By:</strong> {contribution.full_name}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">By:</strong> {contribution.full_name}
                            </p>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">Phone:</strong> {"+" + contribution.phone_number}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Phone:</strong> {"+" + contribution.phone_number}
                            </p>
                            <p className="text-sm text-muted mb-1">
-                              <strong className="text-accent text-sm">Address:</strong> {contribution.address}
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Address:</strong> {contribution.address}
                            </p>
                            <p className="text-sm text-muted mb-2 flex items-center gap-2">
-                              <strong className="text-accent text-sm">Status:</strong>
+                              <strong className="dark:text-blue-500 text-[#4F16F0] text-sm">Status:</strong>
                               <FaDotCircle
                                  className={
                                     contribution.status === "approved"

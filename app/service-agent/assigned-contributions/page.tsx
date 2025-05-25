@@ -121,35 +121,35 @@ export default function AssignedContributionsPage() {
 
    return (
       <div>
-         <h1 className="text-2xl font-bold mb-6">Assigned to Me</h1>
+         <h1 className="text-2xl text-highlight font-bold mb-6">Assigned to Me</h1>
 
          {loading ? (
-            <div className="text-center text-muted">Loading...</div>
+            <div className="text-center text-foreground">Loading...</div>
          ) : contributions.length === 0 ? (
-            <div className="text-center text-muted">No assigned contributions yet.</div>
+            <div className="text-center text-foreground">No assigned contributions yet.</div>
          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                {contributions.map((contribution) => (
-                  <div key={contribution.id} className="bg-background text-foreground rounded-lg shadow-md p-4">
+                  <div key={contribution.id} className="bg-gray shadow-grayInverted text-foreground rounded-lg shadow-sm p-4">
                      <h2 className="text-lg font-semibold mb-2 text-highlight capitalize">{contribution.product_name}</h2>
 
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">By:</strong> {contribution.full_name}</p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Phone:</strong> {"+" + contribution.phone_number}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">By:</strong> {contribution.full_name}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Phone:</strong> {"+" + contribution.phone_number}</p>
                      {contribution.additional_phone && (
-                        <p className="text-sm text-muted mb-1"><strong className="text-accent">Alt Phone:</strong> {contribution.additional_phone}</p>
+                        <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Alt Phone:</strong> {contribution.additional_phone}</p>
                      )}
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Address:</strong> {contribution.address}</p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Landmark:</strong> {contribution.landmark}</p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Location:</strong> <a href={contribution.location_link} target="_blank" className="text-red-500 underline">View</a></p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Pincode:</strong> {contribution.pincode}</p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Contribution Type:</strong> {contribution.contribution_type}</p>
-                     <p className="text-sm text-muted mb-1"><strong className="text-accent">Warranty Covered:</strong> {contribution.warranty_covered ? "Yes" : "No"}</p>
-                     <p className="text-sm text-muted mb-3"><strong className="text-accent">Description:</strong> {contribution.description}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Address:</strong> {contribution.address}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Landmark:</strong> {contribution.landmark}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Location:</strong> <a href={contribution.location_link} target="_blank" className="text-red-500 underline">View</a></p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Pincode:</strong> {contribution.pincode}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Contribution Type:</strong> {contribution.contribution_type}</p>
+                     <p className="text-sm text-muted mb-1"><strong className="dark:text-blue-500 text-[#4F16F0]">Warranty Covered:</strong> {contribution.warranty_covered ? "Yes" : "No"}</p>
+                     <p className="text-sm text-muted mb-3"><strong className="dark:text-blue-500 text-[#4F16F0]">Description:</strong> {contribution.description}</p>
 
-                     <div className="flex flex-wrap gap-2 mt-3">
+                     <div className="flex flex-wrap gap-2 mt-3 justify-between">
                         <Button
                            variant="default"
-                           className="bg-yellow-500 hover:bg-yellow-600  text-white h-6 text-sm"
+                           className="bg-yellow-500 hover:bg-yellow-600  text-foreground h-8 text-sm"
                            onClick={() => handleUnassign(contribution.id)}
                         >
                            Unassign
@@ -157,7 +157,7 @@ export default function AssignedContributionsPage() {
                         {/* Approve Button */}
                         <Button
                            variant="default"
-                           className="text-sm bg-green-500 h-6 text-white hover:bg-green-600"
+                           className="text-sm bg-green-500 h-8 text-foreground hover:bg-green-600"
                            onClick={() => setApproveTarget(contribution)}
                         >
                            Approve
@@ -166,7 +166,7 @@ export default function AssignedContributionsPage() {
                         {/* Reject Button */}
                         <Button
                            variant="default"
-                           className="h-6 text-sm bg-red-500 text-white hover:bg-red-600"
+                           className="h-8 text-sm bg-red-500 text-foreground hover:bg-red-600"
                            onClick={() => {
                               setRejectTarget(contribution);
                               setRejectionReason("");
