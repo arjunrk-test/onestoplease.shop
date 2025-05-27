@@ -137,10 +137,10 @@ export default function AgentLogDetailPage() {
       <div className="p-6 space-y-6">
          <div className="flex items-center justify-between">
             <div>
-               <h2 className="text-xl font-bold">{agent?.full_name || 'Service Agent'}</h2>
+               <h2 className="text-xl text-highlight font-bold">{agent?.full_name || 'Service Agent'}</h2>
                <p className="text-muted-foreground text-sm">{agent?.email}</p>
             </div>
-            <Button variant="outline" onClick={() => router.back()}>
+            <Button variant="default" className='bg-orange-500 hover:bg-orange-600 text-foreground' onClick={() => router.back()}>
                ← Back
             </Button>
          </div>
@@ -148,43 +148,43 @@ export default function AgentLogDetailPage() {
          {/* Filters */}
          <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex items-center gap-2">
-               <label className="text-sm font-medium">From:</label>
+               <label className="text-sm text-foreground font-medium">From:</label>
                <input
                   type="date"
                   value={fromDate.toISOString().slice(0, 10)}
                   min={agent?.created_at?.slice(0, 10)}
                   onChange={(e) => setFromDate(new Date(e.target.value))}
-                  className="border rounded px-2 py-1 text-sm"
+                  className="border bg-gray text-foreground rounded px-2 py-1 text-sm"
                />
 
-               <label className="text-sm font-medium">To:</label>
+               <label className="text-sm text-foreground font-medium">To:</label>
                <input
                   type="date"
                   value={toDate.toISOString().slice(0, 10)}
                   min={fromDate.toISOString().slice(0, 10)}
                   max={new Date().toISOString().slice(0, 10)}
                   onChange={(e) => setToDate(new Date(e.target.value))}
-                  className="border rounded px-2 py-1 text-sm"
+                  className="border bg-gray text-foreground rounded px-2 py-1 text-sm"
                />
 
             </div>
-            <div className="flex items-center gap-2">
-               <Button variant="default" onClick={handleFilter}>View</Button>
-               <Button variant="outline" onClick={downloadCSV}>Download CSV</Button>
+            <div className="flex items-center gap-2 text-foreground">
+               <Button variant="default" className='bg-yellow-500 hover:bg-yellow-600 text-foreground' onClick={handleFilter}>View</Button>
+               <Button variant="default" className='bg-blue-500 hover:bg-blue-600 text-foreground' onClick={downloadCSV}>Download CSV</Button>
             </div>
          </div>
 
          {/* Agent Action Logs */}
          <div>
-            <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
+            <h3 className="text-lg text-foreground font-semibold mb-2">Recent Activity</h3>
             <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
                {logs.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No activity found.</p>
+                  <p className="text-sm text-foreground text-muted-foreground">No activity found.</p>
                ) : (
                   logs.map((log) => (
                      <div
                         key={log.id}
-                        className="border p-4 rounded-lg bg-card shadow-sm"
+                        className="border p-4 rounded-lg bg-gray text-foreground shadow-sm"
                      >
                         <p className="font-medium">{log.action}</p>
                         <p className="text-xs text-muted-foreground">
@@ -200,9 +200,9 @@ export default function AgentLogDetailPage() {
 
          {/* Session History */}
          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Session History</h3>
+            <h3 className="text-lg text-foreground font-semibold">Session History</h3>
             {filteredSessions.length === 0 ? (
-               <p className="text-sm text-muted-foreground">No sessions found for selected range.</p>
+               <p className="text-sm text-foreground text-muted-foreground">No sessions found for selected range.</p>
             ) : (
                filteredSessions.map((session) => {
                   const login = new Date(session.login_time);
@@ -217,16 +217,16 @@ export default function AgentLogDetailPage() {
                   return (
                      <div
                         key={session.id}
-                        className="border p-4 rounded-lg bg-muted shadow-sm space-y-1"
+                        className="border p-4 text-foreground bg-gray rounded-lg bg-muted shadow-sm space-y-1"
                      >
-                        <p className="text-sm">
+                        <p className="text-sm text-foreground">
                            <strong>Date:</strong> {session.date}
                         </p>
-                        <p className="text-sm">
+                        <p className="text-sm text-foreground">
                            <strong>Login:</strong>{' '}
                            {login.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
-                        <p className="text-sm">
+                        <p className="text-sm text-foreground">
                            <strong>Logout:</strong>{' '}
                            {logout
                               ? logout.toLocaleTimeString([], {
@@ -235,7 +235,7 @@ export default function AgentLogDetailPage() {
                               })
                               : 'Still Active'}
                         </p>
-                        <p className="text-sm">
+                        <p className="text-sm text-foreground">
                            <strong>Duration:</strong>{' '}
                            {duration === 'Ongoing' ? (
                               <span className="text-yellow-600">Ongoing</span>
