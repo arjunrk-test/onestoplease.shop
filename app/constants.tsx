@@ -71,12 +71,17 @@ import { ClipboardList, } from "lucide-react";
 import { LuUsers } from "react-icons/lu";
 import { RiAdminLine } from "react-icons/ri";
 import { FiActivity } from "react-icons/fi";
+import { FaHandsHelping } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa6";
+import { CiEdit } from "react-icons/ci";
+import { RxActivityLog } from "react-icons/rx";
+import { GrTransaction } from "react-icons/gr";
 
 export const SideBarLinks = [
   {
     name: "edit products",
     path: "/admin/products",
-    icons: ClipboardList,
+    icons: CiEdit,
     submenu: [
       { name: "Furniture", path: "/admin/products/furniture", icon: IoBedOutline },
       { name: "Appliances", path: "/admin/products/appliances", icon: LuWashingMachine },
@@ -89,7 +94,7 @@ export const SideBarLinks = [
   {
     name: "Contributions",
     path: "/admin/contributions",
-    icons: ClipboardList,
+    icons: FaHandsHelping,
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
@@ -99,14 +104,14 @@ export const SideBarLinks = [
     ],
   },
   {
-    name: "Add Users", path: "/admin/add-users", icons: ClipboardList,
+    name: "Add Users", path: "/admin/add-users", icons: FaUsers,
     submenu: [
       { name: "Add Admin User", path: "/admin/add-users/add-admin", icon: RiAdminLine, },
       { name: "Add Service Agent", path: "/admin/add-users/add-service-agent", icon: LuUsers, },
     ],
   },
   {
-    name: "Logs & Activity", path: "/admin/logs", icons: ClipboardList,
+    name: "Logs & Activity", path: "/admin/logs", icons: RxActivityLog,
     submenu: [
       { name: "Admin login", path: "/admin/logs/admin-logs", icon: RiAdminLine },
       { name: "Agent login", path: "/admin/logs/agent-logs", icon: LuUsers },
@@ -116,7 +121,7 @@ export const SideBarLinks = [
   {
     name: "orders",
     path: "/admin/orders",
-    icons: ClipboardList,
+    icons: GrTransaction,
   },
   
 ];
