@@ -125,13 +125,13 @@ export default function AssignedContributionsPage() {
 
          {/* Table */}
          {loading ? (
-            <p className="text-center text-muted">Loading contributions...</p>
+            <p className="text-center text-foreground text-muted">Loading contributions...</p>
          ) : contributions.length === 0 ? (
-            <p className="text-center text-muted">No contributions found.</p>
+            <p className="text-center text-foreground text-muted">No contributions found.</p>
          ) : (
             <div className="w-full overflow-x-auto">
                <Table>
-                  <TableHeader>
+                  <TableHeader className="text-foreground">
                      <TableRow>
                         <TableHead className="w-[80px]">S.No</TableHead>
                         <TableHead>Product Name</TableHead>
@@ -142,7 +142,7 @@ export default function AssignedContributionsPage() {
                   </TableHeader>
                   <TableBody>
                      {contributions.map((item, index) => (
-                        <TableRow key={item.id} className="cursor-pointer" onClick={() => handleRowClick(item)}>
+                        <TableRow key={item.id} className="cursor-pointer text-foreground" onClick={() => handleRowClick(item)}>
                            <TableCell>{(page - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                            <TableCell className="capitalize">{item.product_name}</TableCell>
                            <TableCell>
@@ -163,7 +163,7 @@ export default function AssignedContributionsPage() {
                            <TableCell>
                               <Button
                                  size="sm"
-                                 className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                                 className="bg-red-500 hover:bg-red-600 text-foreground text-xs"
                                  onClick={(e) => {
                                     e.stopPropagation();
                                     setRevokeTarget(item);
@@ -342,7 +342,7 @@ export default function AssignedContributionsPage() {
                                  Cancel
                               </Button>
                               <Button
-                                 className="bg-red-600 hover:bg-red-700 text-white"
+                                 className="bg-red-600 hover:bg-red-700 text-foreground"
                                  onClick={async () => {
                                     const { error } = await supabase
                                        .from("contributions")
