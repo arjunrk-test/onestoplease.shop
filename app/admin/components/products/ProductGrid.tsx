@@ -34,11 +34,11 @@ export default function ProductGrid({
   return (
     <>
       <div className="mb-6 mt-8">
-        <label className="mr-2 text-sm font-medium">Filter by Subcategory:</label>
+        <label className="mr-2 text-sm text-foreground font-medium">Filter by Subcategory:</label>
         <select
           value={selectedSubcategory}
           onChange={(e) => setSelectedSubcategory(e.target.value)}
-          className="px-3 py-1 border border-gray-300 rounded-md bg-background text-foreground text-sm"
+          className="px-3 py-1 border border-gray-300 rounded-md bg-gray text-foreground text-sm"
         >
           {subcategories.map((sub) => (
             <option key={sub} value={sub}>

@@ -73,15 +73,16 @@ import { RiAdminLine } from "react-icons/ri";
 import { FiActivity } from "react-icons/fi";
 import { FaHandsHelping } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa6";
-import { CiEdit } from "react-icons/ci";
 import { RxActivityLog } from "react-icons/rx";
 import { GrTransaction } from "react-icons/gr";
+import { FaPencil } from "react-icons/fa6";
+
 
 export const SideBarLinks = [
   {
     name: "edit products",
     path: "/admin/products",
-    icons: CiEdit,
+    icons: FaPencil,
     submenu: [
       { name: "Furniture", path: "/admin/products/furniture", icon: IoBedOutline },
       { name: "Appliances", path: "/admin/products/appliances", icon: LuWashingMachine },

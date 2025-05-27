@@ -61,7 +61,7 @@ export default function ProductForm({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg bg-foreground text-background">
+      <DialogContent className="max-w-lg bg-background text-foreground">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Product" : "Add Product"}</DialogTitle>
         </DialogHeader>
@@ -70,6 +70,7 @@ export default function ProductForm({
           <Input
             placeholder="Name"
             value={formData.name}
+            className="bg-gray"
             onChange={(e) => handleChange("name", e.target.value)}
           />
           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -78,7 +79,7 @@ export default function ProductForm({
             placeholder="Description"
             value={formData.description}
             onChange={(e) => handleChange("description", e.target.value)}
-            className="h-48"
+            className="h-48 bg-gray"
           />
           {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
 
@@ -86,14 +87,14 @@ export default function ProductForm({
             placeholder="Category"
             value={formData.category}
             readOnly
-            className="cursor-not-allowed opacity-60"
+            className="cursor-not-allowed opacity-60 bg-gray"
           />
           {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
 
           <select
             value={formData.subcategory}
             onChange={(e) => handleChange("subcategory", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-foreground text-background"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray text-foreground"
           >
             <option value="" disabled>Select Subcategory</option>
             {subcategories.map((sub) => (
@@ -106,6 +107,7 @@ export default function ProductForm({
             placeholder="Price"
             type="number"
             value={formData.price}
+            className="bg-gray"
             onChange={(e) => handleChange("price", e.target.value)}
           />
           {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
@@ -114,6 +116,7 @@ export default function ProductForm({
             placeholder="Stock"
             type="number"
             value={formData.stock}
+            className="bg-gray"
             onChange={(e) => handleChange("stock", e.target.value)}
           />
           {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock}</p>}
@@ -160,7 +163,7 @@ export default function ProductForm({
               </TooltipProvider>
 
               {selectedFile && (
-                <div className="flex items-center gap-2 bg-white text-black px-3 py-2 rounded-md">
+                <div className="flex items-center gap-2 bg-gray h-8 text-grayInverted px-3 py-2 rounded-md">
                   <span className="text-sm max-w-[150px] truncate">{selectedFile.name}</span>
                   <button
                     type="button"
@@ -180,7 +183,7 @@ export default function ProductForm({
             {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
           </div>
 
-          <Button type="submit" className="bg-highlight text-white hover:bg-highlightHover">
+          <Button type="submit" className="bg-green-500 text-foreground hover:bg-green-600">
             {isEditing ? "Update" : "Submit"}
           </Button>
           {errors.submit && <p className="text-red-500 text-xs mt-1">{errors.submit}</p>}
