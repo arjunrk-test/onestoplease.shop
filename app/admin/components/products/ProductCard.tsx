@@ -13,43 +13,18 @@ interface Product {
   image_url?: string;
   category: string;
   subcategory: string;
+  secondary_image_urls?: string[];
 }
 
 interface ProductCardProps {
   product: Product;
-  onDelete: (productId: string) => void;
+  onDelete: (productId: string, imageUrl?: string) => void;
   onEdit: (product: Product) => void;
 }
 
 export default function ProductCard({ product, onDelete, onEdit }: ProductCardProps) {
-  const handleDelete = async () => {
-    try {
-      const imagePath = product.image_url?.split("/storage/v1/object/public/products/")[1];
-      if (imagePath) {
-        const { error: storageError } = await supabase.storage
-          .from("products")
-          .remove([imagePath]);
-
-        if (storageError) {
-          console.error("Image deletion failed:", storageError.message);
-          return;
-        }
-      }
-
-      const { error: deleteError } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", product.id);
-
-      if (deleteError) {
-        console.error("Product deletion failed:", deleteError.message);
-        return;
-      }
-
-      onDelete(product.id);
-    } catch (err) {
-      console.error("Unexpected error during deletion:", err);
-    }
+  const handleDelete = () => {
+    onDelete(product.id, product.image_url);
   };
 
   return (

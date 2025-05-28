@@ -21,6 +21,8 @@ export interface FormData {
   subcategory: string;
   price: string;
   stock: string;
+  secondary_image_files?: File[];
+  secondary_image_urls?: string[];
 }
 
 export default function useProductManager(category: string, subcategoryList: string[]) {
@@ -70,7 +72,11 @@ export default function useProductManager(category: string, subcategoryList: str
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     Object.entries(formData).forEach(([key, value]) => {
-      if (!value.trim()) newErrors[key] = `This ${key} field is required`;
+      if (typeof value === 'string' && !value.trim()) {
+        newErrors[key] = `This ${key} field is required`;
+      } else if (typeof value === 'number' && value === 0) {
+        newErrors[key] = `This ${key} field is required`;
+      }
     });
     if (!selectedFile && !isEditing) newErrors.image = "Image is required";
     setErrors(newErrors);
@@ -99,8 +105,10 @@ export default function useProductManager(category: string, subcategoryList: str
 
     let imageUrl = "";
     let newFileName = "";
+    let secondaryImageUrls: string[] = [];
 
     try {
+      // Handle primary image upload
       if (selectedFile) {
         const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, "");
         const extension = selectedFile.name.split(".").pop()?.toLowerCase();
@@ -134,6 +142,37 @@ export default function useProductManager(category: string, subcategoryList: str
         imageUrl = supabase.storage.from("products").getPublicUrl(newPath).data.publicUrl;
       }
 
+      // Handle secondary images upload
+      if (formData.secondary_image_files && formData.secondary_image_files.length > 0) {
+        const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const uploadPromises = formData.secondary_image_files.map(async (file: File, index: number) => {
+          const extension = file.name.split(".").pop()?.toLowerCase();
+          const secondaryFileName = `${cleanName}${index + 1}.${extension}`;
+          const secondaryPath = `${category}/${subcategory}/${cleanName}/${secondaryFileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("products-secondary")
+            .upload(secondaryPath, file, {
+              cacheControl: "3600",
+              upsert: true,
+            });
+
+          if (uploadError) {
+            throw new Error(`Failed to upload secondary image ${index + 1}: ${uploadError.message}`);
+          }
+
+          return supabase.storage.from("products-secondary").getPublicUrl(secondaryPath).data.publicUrl;
+        });
+
+        try {
+          secondaryImageUrls = await Promise.all(uploadPromises);
+        } catch (error) {
+          console.error("Failed to upload secondary images:", error);
+          setErrors((prev) => ({ ...prev, submit: "Failed to upload secondary images." }));
+          return;
+        }
+      }
+
       if (isEditing && editingProductId) {
         const updateData: any = {
           name,
@@ -144,6 +183,7 @@ export default function useProductManager(category: string, subcategoryList: str
           stock: Number(stock),
         };
         if (imageUrl) updateData.image_url = imageUrl;
+        if (secondaryImageUrls.length > 0) updateData.secondary_image_urls = secondaryImageUrls;
 
         const { error } = await supabase
           .from("products")
@@ -165,6 +205,7 @@ export default function useProductManager(category: string, subcategoryList: str
             price: Number(price),
             stock: Number(stock),
             image_url: imageUrl,
+            secondary_image_urls: secondaryImageUrls,
           },
         ]);
 
@@ -194,25 +235,65 @@ export default function useProductManager(category: string, subcategoryList: str
 
   const handleDelete = async (productId: string, imageUrl?: string) => {
     try {
+      // Delete primary image
       if (imageUrl) {
-        const path = imageUrl.split("/storage/v1/object/public/products/")[1];
-        if (path) {
-          const { error: removeError } = await supabase.storage.from("products").remove([path]);
-          if (removeError) console.error("Failed to delete image:", removeError.message);
+        const imagePath = imageUrl.split("/storage/v1/object/public/products/")[1];
+        if (imagePath) {
+          const { error: storageError } = await supabase.storage
+            .from("products")
+            .remove([imagePath]);
+
+          if (storageError) {
+            console.error("Image deletion failed:", storageError.message);
+            return;
+          }
         }
       }
 
-      const { error } = await supabase.from("products").delete().eq("id", productId);
-      if (error) {
-        console.error("Failed to delete product:", error.message);
+      // Get product details for secondary images
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", productId)
+        .single();
+
+      if (fetchError) {
+        console.error("Failed to fetch product:", fetchError.message);
+        return;
+      }
+
+      // Delete secondary images
+      if (product?.secondary_image_urls?.length) {
+        const sampleImagePath = product.secondary_image_urls[0].split("/storage/v1/object/public/products-secondary/")[1];
+        const folderPath = sampleImagePath.split("/").slice(0, -1).join("/");
+
+        // List all files in the folder
+        const { data, error } = await supabase.storage.from("products-secondary").list(folderPath);
+        if (error) {
+          console.error("Failed to list secondary images:", error.message);
+        } else {
+          const filesToDelete = data.map(file => `${folderPath}/${file.name}`);
+          await supabase.storage.from("products-secondary").remove(filesToDelete);
+        }
+      }
+
+      // Delete the product record
+      const { error: deleteError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", productId);
+
+      if (deleteError) {
+        console.error("Product deletion failed:", deleteError.message);
         return;
       }
 
       setProducts((prev) => prev.filter((p) => p.id !== productId));
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error("Unexpected error during deletion:", err);
     }
   };
+
 
   const handleEditClick = (product: Product) => {
     setFormData({

@@ -10,6 +10,7 @@ interface Product {
   image_url?: string;
   category: string;
   subcategory: string;
+  secondary_image_urls?: string[];
 }
 
 interface ProductGridProps {
@@ -48,7 +49,7 @@ export default function ProductGrid({
         </select>
       </div>
 
-      <div className="overflow-y-auto mt-4 pr-1 scrollbar-hide">
+      <div className="overflow-y-auto mt-4 pr-1 text-foreground scrollbar-hide">
         {loading ? (
           <p>Loading products...</p>
         ) : products.length === 0 ? (
