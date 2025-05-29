@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
 import { RefObject, useState } from "react";
 import { useEffect } from "react";
@@ -66,7 +66,7 @@ export default function ProductForm({
     setFormData((prev) => ({ ...prev, key_features: features }));
   };
 
-  const [specInputs, setSpecInputs] = useState([{ key: "", value: "" }]);
+  const [specInputs, setSpecInputs] = useState<{ key: string; value: string }[]>([]);
   const [secondaryImages, setSecondaryImages] = useState<string[]>([]);
 
 
@@ -76,7 +76,7 @@ export default function ProductForm({
 
   useEffect(() => {
     if (open) {
-      setSpecInputs([{ key: "", value: "" }]);
+      setSpecInputs([]);
       setSecondaryImages([]);
       if (!isEditing) {
         setFormData((prev) => ({ ...prev, specifications: {} }));
@@ -89,7 +89,10 @@ export default function ProductForm({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg bg-background text-foreground overflow-y-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Product" : "Add Product"}</DialogTitle>
+          <DialogTitle className="text-highlight">{isEditing ? "Edit Product" : "Add Product"}</DialogTitle>
+          <DialogDescription>
+            Add or Edit product details here.
+          </DialogDescription>
         </DialogHeader>
 
         <form className="flex flex-col gap-4 mt-4" onSubmit={handleSubmit}>
@@ -233,9 +236,9 @@ export default function ProductForm({
                     updated.splice(index, 1);
                     setFormData((prev) => ({ ...prev, key_features: updated }));
                   }}
-                  className="text-red-500 hover:text-red-700 text-sm"
+                  className="text-red-500 hover:text-red-700 text-xl"
                 >
-                  ❌
+                  ×
                 </button>
               </div>
             ))}
@@ -257,7 +260,7 @@ export default function ProductForm({
           {/* Specifications */}
           <div>
             <label className="text-sm font-medium mb-1 block">Specifications (Optional)</label>
-            {specInputs.map((spec, index) => (
+            {specInputs.length > 0 && specInputs.map((spec, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <Input
                   placeholder="Specification name"
@@ -281,35 +284,36 @@ export default function ProductForm({
                     handleSpecChange(spec.key, e.target.value);
                   }}
                 />
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newSpecs = specInputs.filter((_, i) => i !== index);
-                      setSpecInputs(newSpecs);
-                      const newSpecsObj = { ...formData.specifications };
-                      delete newSpecsObj[spec.key];
-                      setFormData(prev => ({ ...prev, specifications: newSpecsObj }));
-                    }}
-                    className="text-red-500 px-2"
-                  >
-                    ×
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newSpecs = specInputs.filter((_, i) => i !== index);
+                    setSpecInputs(newSpecs);
+                    const newSpecsObj = { ...formData.specifications };
+                    delete newSpecsObj[spec.key];
+                    setFormData(prev => ({ ...prev, specifications: newSpecsObj }));
+                  }}
+                  className="text-red-500 px-2 text-xl hover:text-red-700 "
+                >
+                  ×
+                </button>
               </div>
             ))}
-            <Button
+            <button
               type="button"
               onClick={handleAddSpecField}
-              className="mt-2 bg-highlight hover:bg-highlightHover"
+              className="mt-1 text-blue-500 hover:underline text-sm"
             >
-              Add Specification
-            </Button>
+              + Add Specification
+            </button>
           </div>
 
           {/* File Upload (Main Image) */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Primary Image</label>
+          <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium mb-1 block">Primary Image (only 1)</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
             <div className="flex items-center gap-2">
               <TooltipProvider>
                 <Tooltip>
