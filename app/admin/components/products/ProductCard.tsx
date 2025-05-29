@@ -14,6 +14,10 @@ interface Product {
   category: string;
   subcategory: string;
   secondary_image_urls?: string[];
+  brand?: string;
+  model?: string;
+  specifications: Record<string, any>;
+  key_features?: string[];
 }
 
 interface ProductCardProps {
@@ -44,6 +48,18 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
       <div className="mt-2 text-sm text-muted text-foreground">
         ₹{product.price} • Stock: {product.stock}
         <div>Subcategory: {product.subcategory}</div>
+        {product.brand && <div>Brand: {product.brand}</div>}
+        {product.model && <div>Model: {product.model}</div>}
+        {product.key_features && product.key_features.length > 0 && (
+          <div className="mt-1">
+            <span className="font-semibold">Key Features:</span>
+            <ul className="list-disc list-inside">
+              {product.key_features.map((feature, index) => (
+                <li key={index} className="text-xs">{feature}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Edit & Delete buttons */}

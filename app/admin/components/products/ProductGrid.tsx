@@ -11,6 +11,10 @@ interface Product {
   category: string;
   subcategory: string;
   secondary_image_urls?: string[];
+  brand?: string;
+  model?: string;
+  specifications: Record<string, any>;
+  key_features?: string[];
 }
 
 interface ProductGridProps {

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
 import { RefObject, useState } from "react";
 import { useEffect } from "react";
+import { FormData } from "@/app/admin/hooks/useProductManager";
 
 interface ProductFormProps {
   open: boolean;
@@ -21,22 +22,6 @@ interface ProductFormProps {
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   isEditing: boolean;
 }
-
-interface FormData {
-  name: string;
-  description: string;
-  category: string;
-  subcategory: string;
-  price: string;
-  stock: string;
-  brand?: string;
-  model?: string;
-  specifications?: { [key: string]: string };
-  key_features?: string[];
-  secondary_image_urls?: string[];
-  secondary_image_files?: File[]; 
-}
-
 
 export default function ProductForm({
   open,
@@ -97,59 +82,237 @@ export default function ProductForm({
 
         <form className="flex flex-col gap-4 mt-4" onSubmit={handleSubmit}>
           {/* All original fields preserved */}
-          <Input
-            placeholder="Name"
-            value={formData.name}
-            className="bg-gray"
-            onChange={(e) => handleChange("name", e.target.value)}
-          />
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Name of the product</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <Input
+              placeholder="Name"
+              value={formData.name}
+              className="bg-gray"
+              onChange={(e) => handleChange("name", e.target.value)}
+            />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          </div>
 
-          <Textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            className="h-48 bg-gray"
-          />
-          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Description of the product</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <Textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              className="h-48 bg-gray"
+            />
+            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+          </div>
 
-          <Input
-            placeholder="Category"
-            value={formData.category}
-            readOnly
-            className="cursor-not-allowed opacity-60 bg-gray"
-          />
-          {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Category of the product</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <Input
+              placeholder="Category"
+              value={formData.category}
+              readOnly
+              className="cursor-not-allowed opacity-60 bg-gray"
+            />
+            {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+          </div>
 
-          <select
-            value={formData.subcategory}
-            onChange={(e) => handleChange("subcategory", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray text-foreground"
-          >
-            <option value="" disabled>Select Subcategory</option>
-            {subcategories.map((sub) => (
-              <option key={sub} value={sub}>{sub}</option>
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Subcategory of the product (Do not select all)</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <select
+              value={formData.subcategory}
+              onChange={(e) => handleChange("subcategory", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray text-foreground"
+            >
+              <option value="" disabled>Select Subcategory</option>
+              {subcategories.map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+            {errors.subcategory && <p className="text-red-500 text-xs mt-1">{errors.subcategory}</p>}
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Price of the product</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <Input
+              placeholder="Price"
+              type="number"
+              value={formData.price}
+              className="bg-gray"
+              onChange={(e) => handleChange("price", e.target.value)}
+            />
+            {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Stock of the product</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
+            <Input
+              placeholder="Stock"
+              type="number"
+              value={formData.stock}
+              className="bg-gray"
+              onChange={(e) => handleChange("stock", e.target.value)}
+            />
+            {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock}</p>}
+          </div>
+
+          {/* Brand and Model Fields */}
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Brand of the product</label>
+            </div>
+            <Input
+              placeholder="Brand"
+              value={formData.brand || ""}
+              className="bg-gray"
+              onChange={(e) => handleChange("brand", e.target.value)}
+            />
+            {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium">Model of the product</label>
+            </div>
+            <Input
+              placeholder="Model"
+              value={formData.model || ""}
+              className="bg-gray"
+              onChange={(e) => handleChange("model", e.target.value)}
+            />
+            {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model}</p>}
+          </div>
+
+          {/* Key Features */}
+          {/* <div>
+            <label className="text-sm font-medium mb-1 block">Key Features (one per line)</label>
+            <Textarea
+              placeholder="Enter key features, one per line"
+              value={formData.key_features?.join("\n") || ""}
+              onChange={(e) => handleKeyFeaturesChange(e.target.value)}
+              className="h-32 bg-gray"
+            />
+            {errors.key_features && <p className="text-red-500 text-xs mt-1">{errors.key_features}</p>}
+          </div> */}
+          <div>
+            <label className="text-sm font-medium mb-1 block">Key Features</label>
+
+            {formData.key_features?.map((feature, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <Input
+                  type="text"
+                  value={feature}
+                  onChange={(e) => {
+                    const updated = [...formData.key_features!];
+                    updated[index] = e.target.value;
+                    setFormData((prev) => ({ ...prev, key_features: updated }));
+                  }}
+                  placeholder={`Feature ${index + 1}`}
+                  className="flex-1 border p-2 rounded text-sm bg-gray"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = [...formData.key_features!];
+                    updated.splice(index, 1);
+                    setFormData((prev) => ({ ...prev, key_features: updated }));
+                  }}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  ❌
+                </button>
+              </div>
             ))}
-          </select>
-          {errors.subcategory && <p className="text-red-500 text-xs mt-1">{errors.subcategory}</p>}
 
-          <Input
-            placeholder="Price"
-            type="number"
-            value={formData.price}
-            className="bg-gray"
-            onChange={(e) => handleChange("price", e.target.value)}
-          />
-          {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
+            <button
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  key_features: [...(prev.key_features || []), ""],
+                }))
+              }
+              className="mt-1 text-blue-500 hover:underline text-sm"
+            >
+              + Add Key Feature
+            </button>
 
-          <Input
-            placeholder="Stock"
-            type="number"
-            value={formData.stock}
-            className="bg-gray"
-            onChange={(e) => handleChange("stock", e.target.value)}
-          />
-          {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock}</p>}
+            {errors.key_features && (
+              <p className="text-red-500 text-xs mt-1">{errors.key_features}</p>
+            )}
+          </div>
+
+
+          {/* Specifications */}
+          <div>
+            <label className="text-sm font-medium mb-1 block">Specifications</label>
+            {specInputs.map((spec, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <Input
+                  placeholder="Specification name"
+                  value={spec.key}
+                  className="bg-gray"
+                  onChange={(e) => {
+                    const newSpecs = [...specInputs];
+                    newSpecs[index].key = e.target.value;
+                    setSpecInputs(newSpecs);
+                    handleSpecChange(e.target.value, spec.value);
+                  }}
+                />
+                <Input
+                  placeholder="Value"
+                  value={spec.value}
+                  className="bg-gray"
+                  onChange={(e) => {
+                    const newSpecs = [...specInputs];
+                    newSpecs[index].value = e.target.value;
+                    setSpecInputs(newSpecs);
+                    handleSpecChange(spec.key, e.target.value);
+                  }}
+                />
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newSpecs = specInputs.filter((_, i) => i !== index);
+                      setSpecInputs(newSpecs);
+                      const newSpecsObj = { ...formData.specifications };
+                      delete newSpecsObj[spec.key];
+                      setFormData(prev => ({ ...prev, specifications: newSpecsObj }));
+                    }}
+                    className="text-red-500 px-2"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={handleAddSpecField}
+              className="mt-2 bg-highlight hover:bg-highlightHover"
+            >
+              Add Specification
+            </Button>
+          </div>
+
+
 
           {/* File Upload (Main Image) */}
           <div>
@@ -158,7 +321,7 @@ export default function ProductForm({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <label className="relative cursor-pointer bg-highlight text-white px-4 py-0 rounded-md hover:bg-highlightHover transition">
+                    <label className="relative cursor-pointer bg-highlight text-foreground font-medium px-4 py-0 rounded-md hover:bg-highlightHover transition">
                       Choose File
                       <input
                         ref={fileInputRef}
@@ -214,7 +377,7 @@ export default function ProductForm({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <label className="relative cursor-pointer bg-highlight text-white px-4 py-0 rounded-md hover:bg-highlightHover transition">
+                    <label className="relative cursor-pointer bg-highlight text-foreground font-medium px-4 py-0 rounded-md hover:bg-highlightHover transition">
                       Choose Files
                       <input
                         type="file"
@@ -288,82 +451,6 @@ export default function ProductForm({
                 </div>
               )}
             </div>
-          </div>
-
-          {/* New Fields Below */}
-          <Input
-            placeholder="Brand"
-            value={formData.brand || ""}
-            className="bg-gray"
-            onChange={(e) => handleChange("brand", e.target.value)}
-          />
-
-          <Input
-            placeholder="Model"
-            value={formData.model || ""}
-            className="bg-gray"
-            onChange={(e) => handleChange("model", e.target.value)}
-          />
-
-          {/* Key Features */}
-          <Textarea
-            placeholder="Key Features (one per line)"
-            className="bg-gray"
-            onChange={(e) => handleKeyFeaturesChange(e.target.value)}
-          />
-
-          {/* Specifications */}
-          <div>
-            <p className="font-medium text-sm mb-1">Specifications</p>
-            {specInputs.map((field, idx) => (
-              <div key={idx} className="flex gap-2 mb-1 items-center">
-                <Input
-                  placeholder="Key"
-                  value={field.key}
-                  onChange={(e) => {
-                    const newSpec = [...specInputs];
-                    newSpec[idx].key = e.target.value;
-                    setSpecInputs(newSpec);
-                    handleSpecChange(e.target.value, newSpec[idx].value);
-                  }}
-                  className="bg-gray"
-                />
-                <Input
-                  placeholder="Value"
-                  value={field.value}
-                  onChange={(e) => {
-                    const newSpec = [...specInputs];
-                    newSpec[idx].value = e.target.value;
-                    setSpecInputs(newSpec);
-                    handleSpecChange(newSpec[idx].key, e.target.value);
-                  }}
-                  className="bg-gray"
-                />
-                {specInputs.length > 1 && (
-                  <button
-                    type="button"
-                    className="text-red-500 text-lg font-bold px-2"
-                    onClick={() => {
-                      const updated = specInputs.filter((_, i) => i !== idx);
-                      setSpecInputs(updated);
-
-                      // Also update formData.specifications
-                      const updatedSpecs = { ...(formData.specifications || {}) };
-                      delete updatedSpecs[field.key];
-                      setFormData((prev) => ({
-                        ...prev,
-                        specifications: updatedSpecs,
-                      }));
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <Button type="button" onClick={handleAddSpecField} className="mt-1 bg-gray text-sm">
-              + Add Specification
-            </Button>
           </div>
 
           <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">
