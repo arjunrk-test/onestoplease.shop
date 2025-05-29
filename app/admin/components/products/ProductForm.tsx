@@ -42,12 +42,24 @@ export default function ProductForm({
   };
 
   const handleSpecChange = (key: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      specifications: { ...(prev.specifications || {}), [key]: value },
-    }));
+    // Only update if both key and value are non-empty
+    if (key.trim() && value.trim()) {
+      const newSpecs = { ...(formData.specifications || {}) };
+      // Remove any partial matches of the current key
+      Object.keys(newSpecs).forEach(existingKey => {
+        if (existingKey.startsWith(key.trim()) || key.trim().startsWith(existingKey)) {
+          delete newSpecs[existingKey];
+        }
+      });
+      // Add the new specification
+      newSpecs[key.trim()] = value.trim();
+      
+      setFormData(prev => ({
+        ...prev,
+        specifications: newSpecs
+      }));
+    }
   };
-
 
   const handleKeyFeaturesChange = (value: string) => {
     const features = value.split("\n").filter((line) => line.trim() !== "");
@@ -175,7 +187,7 @@ export default function ProductForm({
           {/* Brand and Model Fields */}
           <div>
             <div className="flex items-center space-x-1">
-              <label className="text-sm font-medium">Brand of the product</label>
+              <label className="text-sm font-medium">Brand of the product (Optional)</label>
             </div>
             <Input
               placeholder="Brand"
@@ -183,12 +195,11 @@ export default function ProductForm({
               className="bg-gray"
               onChange={(e) => handleChange("brand", e.target.value)}
             />
-            {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
           </div>
 
           <div>
             <div className="flex items-center space-x-1">
-              <label className="text-sm font-medium">Model of the product</label>
+              <label className="text-sm font-medium">Model of the product (Optional)</label>
             </div>
             <Input
               placeholder="Model"
@@ -196,22 +207,11 @@ export default function ProductForm({
               className="bg-gray"
               onChange={(e) => handleChange("model", e.target.value)}
             />
-            {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model}</p>}
           </div>
 
           {/* Key Features */}
-          {/* <div>
-            <label className="text-sm font-medium mb-1 block">Key Features (one per line)</label>
-            <Textarea
-              placeholder="Enter key features, one per line"
-              value={formData.key_features?.join("\n") || ""}
-              onChange={(e) => handleKeyFeaturesChange(e.target.value)}
-              className="h-32 bg-gray"
-            />
-            {errors.key_features && <p className="text-red-500 text-xs mt-1">{errors.key_features}</p>}
-          </div> */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Key Features</label>
+            <label className="text-sm font-medium mb-1 block">Key Features (Optional)</label>
 
             {formData.key_features?.map((feature, index) => (
               <div key={index} className="flex items-center gap-2 mb-2">
@@ -252,16 +252,11 @@ export default function ProductForm({
             >
               + Add Key Feature
             </button>
-
-            {errors.key_features && (
-              <p className="text-red-500 text-xs mt-1">{errors.key_features}</p>
-            )}
           </div>
-
 
           {/* Specifications */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Specifications</label>
+            <label className="text-sm font-medium mb-1 block">Specifications (Optional)</label>
             {specInputs.map((spec, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <Input
@@ -311,8 +306,6 @@ export default function ProductForm({
               Add Specification
             </Button>
           </div>
-
-
 
           {/* File Upload (Main Image) */}
           <div>
@@ -372,7 +365,10 @@ export default function ProductForm({
 
           {/* Secondary Images Upload */}
           <div>
-            <label className="text-sm font-medium mb-1 block">Secondary Images (max 4)</label>
+            <div className="flex items-center space-x-1">
+              <label className="text-sm font-medium mb-1 block">Secondary Images (max 4)</label>
+              <p className="text-red-500 text-xl">*</p>
+            </div>
             <div className="flex items-center gap-2 flex-wrap">
               <TooltipProvider>
                 <Tooltip>
@@ -451,6 +447,7 @@ export default function ProductForm({
                 </div>
               )}
             </div>
+            {errors.secondary_images && <p className="text-red-500 text-xs mt-1">{errors.secondary_images}</p>}
           </div>
 
           <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">

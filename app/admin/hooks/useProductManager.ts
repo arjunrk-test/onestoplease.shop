@@ -83,14 +83,26 @@ export default function useProductManager(category: string, subcategoryList: str
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    Object.entries(formData).forEach(([key, value]) => {
+    
+    // Required fields validation
+    const requiredFields = ['name', 'description', 'category', 'subcategory', 'price', 'stock'];
+    
+    requiredFields.forEach(field => {
+      const value = formData[field as keyof FormData];
       if (typeof value === 'string' && !value.trim()) {
-        newErrors[key] = `This ${key} field is required`;
-      } else if (typeof value === 'number' && value === 0) {
-        newErrors[key] = `This ${key} field is required`;
+        newErrors[field] = `This ${field} field is required`;
       }
     });
-    if (!selectedFile && !isEditing) newErrors.image = "Image is required";
+
+    // Image validations
+    if (!selectedFile && !isEditing) {
+      newErrors.image = "Primary image is required";
+    }
+
+    if (!formData.secondary_image_files?.length && !isEditing) {
+      newErrors.secondary_images = "At least one secondary image is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
