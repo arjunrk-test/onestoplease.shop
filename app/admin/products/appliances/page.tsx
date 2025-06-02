@@ -41,10 +41,14 @@ export default function AppliancesPage() {
         setFormData({
           name: "",
           description: "",
-          category: "Appliances",
+          category: "Furniture",
           subcategory: "",
           price: "",
           stock: "",
+          brand: "",
+          model: "",
+          specifications: {},
+          key_features: [],
         });
         setSelectedFile(null);
         setIsEditing(false);

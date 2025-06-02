@@ -41,10 +41,14 @@ export default function BabyPage() {
         setFormData({
           name: "",
           description: "",
-          category: "Baby",
+          category: "Furniture",
           subcategory: "",
           price: "",
           stock: "",
+          brand: "",
+          model: "",
+          specifications: {},
+          key_features: [],
         });
         setSelectedFile(null);
         setIsEditing(false);

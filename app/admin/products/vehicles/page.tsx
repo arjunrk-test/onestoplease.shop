@@ -41,10 +41,14 @@ export default function VehiclesPage() {
         setFormData({
           name: "",
           description: "",
-          category: "Vehicles",
+          category: "Furniture",
           subcategory: "",
           price: "",
           stock: "",
+          brand: "",
+          model: "",
+          specifications: {},
+          key_features: [],
         });
         setSelectedFile(null);
         setIsEditing(false);

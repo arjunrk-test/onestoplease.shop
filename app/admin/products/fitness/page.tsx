@@ -41,10 +41,14 @@ export default function FitnessPage() {
         setFormData({
           name: "",
           description: "",
-          category: "Fitness",
+          category: "Furniture",
           subcategory: "",
           price: "",
           stock: "",
+          brand: "",
+          model: "",
+          specifications: {},
+          key_features: [],
         });
         setSelectedFile(null);
         setIsEditing(false);

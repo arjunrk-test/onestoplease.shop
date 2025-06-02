@@ -41,10 +41,14 @@ export default function ElectronicsPage() {
         setFormData({
           name: "",
           description: "",
-          category: "Electronics",
+          category: "Furniture",
           subcategory: "",
           price: "",
           stock: "",
+          brand: "",
+          model: "",
+          specifications: {},
+          key_features: [],
         });
         setSelectedFile(null);
         setIsEditing(false);
