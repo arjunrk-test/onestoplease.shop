@@ -1,21 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { IoMdAdd } from "react-icons/io";
 import Papa from "papaparse";
-import ProductForm from "@/app/admin/components/products/ProductForm";
-import ProductGrid from "@/app/admin/components/products/ProductGrid";
-import useProductManager from "@/app/admin/hooks/useProductManager";
+import ProductForm from "./ProductForm";
+import ProductGrid from "./ProductGrid";
+import useProductManager from "../../hooks/useProductManager";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { uploadViaDriveApi } from "@/app/admin/lib/uploadViaApi";
+import { uploadViaDriveApi } from "../../lib/uploadViaApi";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
+import { categoryConfig } from "../../products/categoryConfig";
+import { useParams } from "next/navigation";
 
-export default function FurniturePage() {
-  const subcategories = ["All", "Livingroom", "Bedroom", "Kitchen", "Work"];
+export default function ProductsListPage() {
+   const params = useParams();
+  if (!params || typeof params.category !== "string") {
+    return <div className="p-6 text-gray-500">Loading...</div>;
+  }
 
+  const rawCategory = decodeURIComponent(params.category);
+
+  const category = Object.keys(categoryConfig).find(
+    (key) => key.toLowerCase() === rawCategory.toLowerCase()
+  );
+
+  if (!category) {
+    return <div className="p-6 text-red-500">Invalid category: {rawCategory}</div>;
+  }
+
+  const subcategories = categoryConfig[category] ?? ["All"];
   const {
     products,
     loading,
@@ -36,7 +52,7 @@ export default function FurniturePage() {
     setEditingProductId,
     selectedSubcategory,
     setSelectedSubcategory,
-  } = useProductManager("Furniture", subcategories);
+  } = useProductManager(category, subcategories);
 
   const [sheetUrl, setSheetUrl] = useState("");
   const [fetching, setFetching] = useState(false);
@@ -45,14 +61,13 @@ export default function FurniturePage() {
     try {
       setFetching(true);
       const products = await fetchProductsFromSheet(sheetUrl);
-      const filtered = products.filter((p) => p.category === "Furniture");
+      const filtered = products.filter((p) => p.category === category);
 
       let addedCount = 0;
       for (const product of filtered) {
-        const { name, category, subcategory } = product;
+        const { name, subcategory } = product;
         const cleanName = name.toLowerCase().replace(/[^a-z0-9]/gi, "");
 
-        // Check if already in DB
         const { data: existing } = await supabase
           .from("products")
           .select("id")
@@ -62,14 +77,12 @@ export default function FurniturePage() {
 
         if (existing && existing.length > 0) continue;
 
-        // Upload primary image
         const primaryUrl = await uploadViaDriveApi(
           product.image_url,
           "products",
           `${category}/${subcategory}/${cleanName}.png`
         );
 
-        // Upload secondary images
         const secondaryUrls: string[] = [];
         if (product.secondary_image_urls) {
           try {
@@ -107,7 +120,7 @@ export default function FurniturePage() {
         addedCount++;
       }
 
-      toast.success(`Added ${addedCount} new furniture products.`);
+      toast.success(`Added ${addedCount} new ${category} products.`);
     } catch (err: any) {
       console.error(err);
       toast.error("Failed to fetch products from sheet.");
@@ -140,13 +153,13 @@ export default function FurniturePage() {
     {
       name: "add",
       bgColour: "bg-green-500",
-      tooltipValue: "Add Furniture",
+      tooltipValue: `Add ${category}`,
       icon: <IoMdAdd />,
       executeFunction: () => {
         setFormData({
           name: "",
           description: "",
-          category: "Furniture",
+          category,
           subcategory: "",
           price: "",
           stock: "",
@@ -166,7 +179,7 @@ export default function FurniturePage() {
   return (
     <main className="h-[calc(100vh-64px)] flex flex-col overflow-hidden p-6">
       <div className="flex justify-between items-center mb-4 px-0 sticky top-0">
-        <h1 className="text-2xl font-bold text-highlight">Edit Furniture</h1>
+        <h1 className="text-2xl font-bold text-highlight">Edit {category}</h1>
         <div className="flex items-center gap-4">
           <Input
             type="text"
@@ -216,7 +229,7 @@ export default function FurniturePage() {
       <ProductForm
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        category="Furniture"
+        category={category}
         subcategories={subcategories}
         formData={formData}
         setFormData={setFormData}

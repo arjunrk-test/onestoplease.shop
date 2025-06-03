@@ -89,7 +89,7 @@ export const SideBarLinks = [
       { name: "Electronics", path: "/admin/products/electronics", icon: HiOutlineDevicePhoneMobile },
       { name: "Vehicles", path: "/admin/products/vehicles", icon: RiEBikeLine },
       { name: "Fitness", path: "/admin/products/fitness", icon: CiDumbbell },
-      { name: "Baby", path: "/admin/products/baby-products", icon: PiBabyCarriageLight },
+      { name: "Baby", path: "/admin/products/baby", icon: PiBabyCarriageLight },
     ],
   },
   {
