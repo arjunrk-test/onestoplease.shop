@@ -15,23 +15,22 @@ import { v4 as uuidv4 } from "uuid";
 import { categoryConfig } from "../../products/categoryConfig";
 import { useParams } from "next/navigation";
 
+
+
 export default function ProductsListPage() {
-   const params = useParams();
-  if (!params || typeof params.category !== "string") {
-    return <div className="p-6 text-gray-500">Loading...</div>;
-  }
+  const params = useParams();
+  const rawCategory = typeof params?.category === "string" ? decodeURIComponent(params.category) : null;
 
-  const rawCategory = decodeURIComponent(params.category);
+  const category =
+    rawCategory &&
+    Object.keys(categoryConfig).find(
+      (key) => key.toLowerCase() === rawCategory.toLowerCase()
+    );
 
-  const category = Object.keys(categoryConfig).find(
-    (key) => key.toLowerCase() === rawCategory.toLowerCase()
-  );
+  const subcategories = category ? categoryConfig[category] ?? ["All"] : [];
+  const [sheetUrl, setSheetUrl] = useState("");
+  const [fetching, setFetching] = useState(false);
 
-  if (!category) {
-    return <div className="p-6 text-red-500">Invalid category: {rawCategory}</div>;
-  }
-
-  const subcategories = categoryConfig[category] ?? ["All"];
   const {
     products,
     loading,
@@ -52,10 +51,15 @@ export default function ProductsListPage() {
     setEditingProductId,
     selectedSubcategory,
     setSelectedSubcategory,
-  } = useProductManager(category, subcategories);
+  } = useProductManager(category || "", subcategories); 
 
-  const [sheetUrl, setSheetUrl] = useState("");
-  const [fetching, setFetching] = useState(false);
+  if (!params || typeof params.category !== "string") {
+    return <div className="p-6 text-gray-500">Loading...</div>;
+  }
+
+  if (!category) {
+    return <div className="p-6 text-red-500">Invalid category: {rawCategory}</div>;
+  }
 
   const handleFetchProducts = async () => {
     try {
@@ -179,7 +183,7 @@ export default function ProductsListPage() {
   return (
     <main className="h-[calc(100vh-64px)] flex flex-col overflow-hidden p-6">
       <div className="flex justify-between items-center mb-4 px-0 sticky top-0">
-        <h1 className="text-2xl font-bold text-highlight">Edit {category}</h1>
+        <h1 className="text-2xl font-bold text-highlight">Edit {category} products</h1>
         <div className="flex items-center gap-4">
           <Input
             type="text"

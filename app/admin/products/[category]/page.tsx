@@ -1,5 +1,6 @@
 import ProductsListPage from "@/app/admin/components/products/ProductsListPage";
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
+export default function CategoryPage() {
   return <ProductsListPage />;
 }
+
