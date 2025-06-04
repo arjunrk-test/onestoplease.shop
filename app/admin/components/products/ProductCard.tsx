@@ -3,6 +3,7 @@ import { CiEdit } from "react-icons/ci";
 import { MdDeleteOutline } from "react-icons/md";
 import { supabase } from "@/lib/supabaseClient";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip"
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -27,12 +28,25 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onDelete, onEdit }: ProductCardProps) {
+  const router = useRouter();
+
   const handleDelete = () => {
     onDelete(product.id, product.image_url);
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open new tab if clicking on edit or delete buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    window.open(`/admin/products/${product.category}/${product.id}`, '_blank');
+  };
+
   return (
-    <div className="border border-gray rounded-lg p-4 bg-gray shadow-md relative group w-full">
+    <div 
+      className="border border-gray rounded-lg p-4 bg-gray shadow-md relative group w-full cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleCardClick}
+    >
       {product.image_url && (
         <div className="w-full aspect-square flex items-center justify-center bg-muted rounded-md mb-4">
           <img
@@ -44,13 +58,13 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
       )}
 
       <h3 className="text-lg font-bold text-highlight">{product.name}</h3>
-      <p className="text-sm text-foreground mt-1">{product.description}</p>
+      {/* <p className="text-sm text-foreground mt-1">{product.description}</p> */}
       <div className="mt-2 text-sm text-muted text-foreground">
         ₹{product.price} • Stock: {product.stock}
         <div>Subcategory: {product.subcategory}</div>
-        {product.brand && <div>Brand: {product.brand}</div>}
-        {product.model && <div>Model: {product.model}</div>}
-        {product.key_features && product.key_features.length > 0 && (
+        {/* {product.brand && <div>Brand: {product.brand}</div>} */}
+        {/* {product.model && <div>Model: {product.model}</div>} */}
+        {/* {product.key_features && product.key_features.length > 0 && (
           <div className="mt-1">
             <span className="font-semibold">Key Features:</span>
             <ul className="list-disc list-inside">
@@ -59,7 +73,7 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
               ))}
             </ul>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Edit & Delete buttons */}
@@ -68,7 +82,10 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onEdit(product)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(product);
+                }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-foreground p-2 rounded"
               >
                 <CiEdit className="text-lg" />
@@ -84,7 +101,10 @@ export default function ProductCard({ product, onDelete, onEdit }: ProductCardPr
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={handleDelete}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete();
+                }}
                 className="bg-red-500 hover:bg-red-600 text-foreground p-2 rounded"
               >
                 <MdDeleteOutline className="text-lg" />
