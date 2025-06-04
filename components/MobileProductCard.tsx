@@ -12,6 +12,7 @@ interface Product {
    name: string;
    price: number;
    image_url: string;
+   category: string;
 }
 
 export default function MobileProductCard({ product }: { product: Product }) {
@@ -79,8 +80,19 @@ export default function MobileProductCard({ product }: { product: Product }) {
       toast.success("Added to cart");
    };
 
+   const handleCardClick = (e: React.MouseEvent) => {
+      // Don't open new tab if clicking on buttons
+      if ((e.target as HTMLElement).closest('button')) {
+         return;
+      }
+      window.open(`/products/${product.category}/${product.id}/mobile`, '_blank');
+   };
+
    return (
-      <div className="bg-white rounded-lg shadow p-3 w-full flex flex-col gap-3 ">
+      <div 
+         className="bg-white rounded-lg shadow p-3 w-full flex flex-col gap-3 cursor-pointer"
+         onClick={handleCardClick}
+      >
          <img
             src={product.image_url}
             alt={product.name}
@@ -94,7 +106,10 @@ export default function MobileProductCard({ product }: { product: Product }) {
 
          <div className="flex justify-between items-center gap-2">
             <Button
-               onClick={handleWishlist}
+               onClick={(e) => {
+                  e.stopPropagation();
+                  handleWishlist();
+               }}
                className="flex-1 bg-red-100 text-red-600 text-sm py-1 rounded-full"
             >
                {isWishlisted ? (
@@ -122,7 +137,10 @@ export default function MobileProductCard({ product }: { product: Product }) {
                )}
             </Button>
             <Button
-               onClick={handleAddToCart}
+               onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart();
+               }}
                className="flex-1 bg-highlight text-white text-sm py-1 rounded-full"
             >
                Add to Cart

@@ -13,6 +13,7 @@ interface Product {
   name: string;
   price: number;
   image_url: string;
+  category: string;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -75,8 +76,19 @@ export default function ProductCard({ product }: { product: Product }) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open new tab if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    window.open(`/products/${product.category}/${product.id}`, '_blank');
+  };
+
   return (
-    <div className="group relative bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square flex flex-col items-center justify-between">
+    <div 
+      className="group relative bg-white text-black/80 rounded-lg shadow p-4 w-full aspect-square flex flex-col items-center justify-between cursor-pointer"
+      onClick={handleCardClick}
+    >
       <img
         src={product.image_url}
         alt={product.name}
@@ -93,7 +105,8 @@ export default function ProductCard({ product }: { product: Product }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const cartItems = useCartStore.getState().items;
                   const alreadyInCart = cartItems.some((item) => item.id === product.id);
 
@@ -146,7 +159,10 @@ export default function ProductCard({ product }: { product: Product }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={handleWishlist}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleWishlist();
+                }}
                 className="bg-black/80 hover:bg-muted p-3 rounded-full shadow"
               >
                 {isWishlisted ? (
@@ -178,7 +194,13 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* View Details */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="bg-black/80 hover:bg-muted p-3 rounded-full shadow">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(`/products/${product.category}/${product.id}`, '_blank');
+                }}
+                className="bg-black/80 hover:bg-muted p-3 rounded-full shadow"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405M19 21l-4-4m0 0a7 7 0 
                   10-10 0 7 7 0 0010 0z" />
