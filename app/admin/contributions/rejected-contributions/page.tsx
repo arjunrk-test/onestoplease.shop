@@ -122,13 +122,13 @@ export default function RejectedContributionsPage() {
 
          {/* Table */}
          {loading ? (
-            <p className="text-center text-muted">Loading contributions...</p>
+            <p className="text-center text-foreground text-muted">Loading contributions...</p>
          ) : contributions.length === 0 ? (
-            <p className="text-center text-muted">No contributions found.</p>
+            <p className="text-center text-foreground text-muted">No contributions found.</p>
          ) : (
             <div className="w-full overflow-x-auto">
                <Table>
-                  <TableHeader>
+                  <TableHeader className="text-foreground">
                      <TableRow>
                         <TableHead className="w-[80px]">S.No</TableHead>
                         <TableHead>Product Name</TableHead>
@@ -139,7 +139,7 @@ export default function RejectedContributionsPage() {
                   </TableHeader>
                   <TableBody>
                      {contributions.map((item, index) => (
-                        <TableRow key={item.id} className="cursor-pointer" onClick={() => handleRowClick(item)}>
+                        <TableRow key={item.id} className="cursor-pointer text-foreground" onClick={() => handleRowClick(item)}>
                            <TableCell>{(page - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                            <TableCell className="capitalize">{item.product_name}</TableCell>
                            <TableCell>
@@ -160,7 +160,7 @@ export default function RejectedContributionsPage() {
                            <TableCell>
                               <Button
                                  size="sm"
-                                 className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                                 className="bg-red-500 hover:bg-red-600 text-foreground text-xs"
                                  onClick={(e) => {
                                     e.stopPropagation();
                                     setRevokeTarget(item);
@@ -334,15 +334,15 @@ export default function RejectedContributionsPage() {
                   <h3 className="text-lg font-semibold mb-4 text-highlight">
                      Revoke "{revokeTarget.product_name}"?
                   </h3>
-                  <p className="text-sm text-muted mb-4">
+                  <p className="text-sm text-muted text-foreground mb-4">
                      This will change the status to <strong>pending</strong> and remove the rejection reason.
                   </p>
                   <div className="flex justify-end gap-3">
-                     <Button variant="outline" onClick={() => setRevokeTarget(null)}>
+                     <Button variant="outline" className="text-foreground bg-yellow-500 hover:bg-yellow-600" onClick={() => setRevokeTarget(null)}>
                         Cancel
                      </Button>
                      <Button
-                        className="bg-red-600 hover:bg-red-700 text-white"
+                        className="bg-red-500 hover:bg-red-600 text-foreground border"
                         onClick={async () => {
                            const { error } = await supabase
                               .from("contributions")

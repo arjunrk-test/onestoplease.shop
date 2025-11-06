@@ -53,13 +53,91 @@ import { LuWashingMachine } from "react-icons/lu";
 import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
 import { CiDumbbell } from "react-icons/ci";
 import { PiBabyCarriageLight } from "react-icons/pi";
-export const Categories = [
-  { category: "furniture", name: "Furniture", icon: <IoBedOutline /> },
-  { category: "appliances", name: "Appliances", icon: <LuWashingMachine /> },
-  { category: "electronics", name: "Electronics", icon: <HiOutlineDevicePhoneMobile /> },
-  { category: "vehicles", name: "Vehicles", icon: <RiEBikeLine /> },
-  { category: "fitness", name: "Fitness", icon: <CiDumbbell /> },
-  { category: "baby-products", name: "Baby", icon: <PiBabyCarriageLight /> },
+import { IconType } from "react-icons";
+
+
+interface Subcategory {
+  key: string;
+  label: string;
+}
+
+// Type for category
+export interface CategoryType {
+  category: string;
+  name: string;
+  icon: IconType;
+  description: string;
+  subcategories: Subcategory[];
+}
+
+export const Categories: CategoryType[] = [
+  {
+    category: "furniture",
+    name: "Furniture",
+    icon: IoBedOutline,
+    description: "Style your space effortlessly—rent premium furniture today!",
+    subcategories: [
+      { key: "livingroom", label: "Living Room" },
+      { key: "kitchen", label: "Kitchen & Dining" },
+      { key: "bedroom", label: "Bedroom" },
+      { key: "work", label: "Work" },
+    ],
+  },
+  {
+    category: "appliances",
+    name: "Appliances",
+    icon: LuWashingMachine,
+    description: "Upgrade your home hassle-free—rent top-notch appliances today!",
+    subcategories: [
+      { key: "livingroom", label: "Living Room" },
+      { key: "kitchen", label: "Kitchen" },
+      { key: "bedroom", label: "Bedroom" },
+      { key: "washing", label: "Washing Machine" },
+    ],
+  },
+  {
+    category: "electronics",
+    name: "Electronics",
+    icon: HiOutlineDevicePhoneMobile,
+    description: "Power up your life with gadgets you need, when you need them!",
+    subcategories: [
+      { key: "smartphones", label: "Smart Phones" },
+      { key: "laptops", label: "Laptops" },
+    ],
+  },
+  {
+    category: "vehicles",
+    name: "Vehicles",
+    icon: RiEBikeLine,
+    description: "Hit the road with ease—rent the perfect ride for any journey!",
+    subcategories: [
+      { key: "scooters", label: "Scooters" },
+      { key: "bikes", label: "Bikes" },
+      { key: "cars", label: "Cars" },
+    ],
+  },
+  {
+    category: "fitness",
+    name: "Fitness",
+    icon: CiDumbbell,
+    description: "Level up your workouts—rent premium fitness gear today!",
+    subcategories: [
+      { key: "treadmills", label: "Treadmills" },
+      { key: "crosstrainers", label: "Cross Trainers" },
+      { key: "exercisebikes", label: "Exercise Bikes" },
+      { key: "massagers", label: "Massagers" },
+    ],
+  },
+  {
+    category: "baby-products",
+    name: "Baby",
+    icon: PiBabyCarriageLight,
+    description: "Make parenting easier—rent top-quality baby & kids essentials hassle-free!",
+    subcategories: [
+      { key: "babyfurniture", label: "Baby Furniture" },
+      { key: "kidsbikes", label: "Kids Bikes" },
+    ],
+  },
 ];
 
 export const CategoriesPath = Categories.map((category) => ({
@@ -67,29 +145,34 @@ export const CategoriesPath = Categories.map((category) => ({
   pathName: `/products/${category.category}`,
 }));
 
-import { ClipboardList, } from "lucide-react";
 import { LuUsers } from "react-icons/lu";
 import { RiAdminLine } from "react-icons/ri";
 import { FiActivity } from "react-icons/fi";
+import { FaHandsHelping } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa6";
+import { RxActivityLog } from "react-icons/rx";
+import { GrTransaction } from "react-icons/gr";
+import { FaPencil } from "react-icons/fa6";
+
 
 export const SideBarLinks = [
   {
     name: "edit products",
     path: "/admin/products",
-    icons: ClipboardList,
+    icons: FaPencil,
     submenu: [
       { name: "Furniture", path: "/admin/products/furniture", icon: IoBedOutline },
       { name: "Appliances", path: "/admin/products/appliances", icon: LuWashingMachine },
       { name: "Electronics", path: "/admin/products/electronics", icon: HiOutlineDevicePhoneMobile },
       { name: "Vehicles", path: "/admin/products/vehicles", icon: RiEBikeLine },
       { name: "Fitness", path: "/admin/products/fitness", icon: CiDumbbell },
-      { name: "Baby", path: "/admin/products/baby-products", icon: PiBabyCarriageLight },
+      { name: "Baby", path: "/admin/products/baby", icon: PiBabyCarriageLight },
     ],
   },
   {
     name: "Contributions",
     path: "/admin/contributions",
-    icons: ClipboardList,
+    icons: FaHandsHelping,
     submenu: [
       { name: "All Contributions", path: "/admin/contributions/all-contributions", icon: BsBoxSeam, },
       { name: "Pending", path: "/admin/contributions/pending-contributions", icon: FiInbox, },
@@ -99,14 +182,14 @@ export const SideBarLinks = [
     ],
   },
   {
-    name: "Add Users", path: "/admin/add-users", icons: ClipboardList,
+    name: "Add Users", path: "/admin/add-users", icons: FaUsers,
     submenu: [
       { name: "Add Admin User", path: "/admin/add-users/add-admin", icon: RiAdminLine, },
       { name: "Add Service Agent", path: "/admin/add-users/add-service-agent", icon: LuUsers, },
     ],
   },
   {
-    name: "Logs & Activity", path: "/admin/logs", icons: ClipboardList,
+    name: "Logs & Activity", path: "/admin/logs", icons: RxActivityLog,
     submenu: [
       { name: "Admin login", path: "/admin/logs/admin-logs", icon: RiAdminLine },
       { name: "Agent login", path: "/admin/logs/agent-logs", icon: LuUsers },
@@ -116,7 +199,7 @@ export const SideBarLinks = [
   {
     name: "orders",
     path: "/admin/orders",
-    icons: ClipboardList,
+    icons: GrTransaction,
   },
   
 ];

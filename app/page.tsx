@@ -8,7 +8,7 @@ import useIsMobile from "@/hooks/useIsMobile";
 
 export default function Home() {
   const isMobile = useIsMobile();
-
+  
   return (
     <main className="min-h-screen flex flex-col bg-gray">
       {isMobile ? <MobileNavbar /> : <Navbar />}
@@ -55,18 +55,21 @@ export default function Home() {
       <section className="w-full px-6 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {Categories.map((category) => (
-              <Link key={category.name} href={`/products/${category.category}`}>
-                <div className="bg-background p-4 rounded-xl shadow hover:shadow-xl hover:shadow-accent transition-all cursor-pointer flex flex-col items-center justify-center group">
-                  <div className="text-2xl text-highlight group-hover:text-accent transition-colors">
-                    {category.icon}
+            {Categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <Link key={category.name} href={`/products/${category.category}`}>
+                  <div className="bg-background p-4 rounded-xl shadow hover:shadow-xl hover:shadow-accent transition-all cursor-pointer flex flex-col items-center justify-center group">
+                    <div className="text-2xl text-highlight group-hover:text-accent transition-colors">
+                      <Icon />
+                    </div>
+                    <p className="text-xs p-2 font-medium text-foreground">
+                      {category.name}
+                    </p>
                   </div>
-                  <p className="text-xs p-2 font-medium text-foreground">
-                    {category.name}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

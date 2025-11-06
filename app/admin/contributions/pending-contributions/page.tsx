@@ -154,13 +154,13 @@ export default function PendingContributionsPage() {
 
          {/* Table */}
          {loading ? (
-            <p className="text-center text-muted">Loading contributions...</p>
+            <p className="text-center text-foreground text-muted">Loading contributions...</p>
          ) : contributions.length === 0 ? (
-            <p className="text-center text-muted">No contributions found.</p>
+            <p className="text-center text-foreground text-muted">No contributions found.</p>
          ) : (
             <div className="w-full overflow-x-auto">
                <Table>
-                  <TableHeader>
+                  <TableHeader className="text-foreground">
                      <TableRow>
                         <TableHead className="w-[80px]">S.No</TableHead>
                         <TableHead>Product Name</TableHead>
@@ -172,7 +172,7 @@ export default function PendingContributionsPage() {
                   </TableHeader>
                   <TableBody>
                      {contributions.map((item, index) => (
-                        <TableRow key={item.id} className="cursor-pointer" onClick={() => handleRowClick(item)}>
+                        <TableRow key={item.id} className="cursor-pointer text-foreground" onClick={() => handleRowClick(item)}>
                            <TableCell>{(page - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                            <TableCell className="capitalize">{item.product_name}</TableCell>
                            <TableCell>
@@ -199,10 +199,10 @@ export default function PendingContributionsPage() {
                                     }}
                                     defaultValue={item.assigned_to}
                                  >
-                                    <SelectTrigger className="w-[160px] h-8 bg-background text-foreground">
+                                    <SelectTrigger className="w-[160px] h-8 bg-gray text-grayInverted">
                                        <SelectValue placeholder="Select Agent" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-background text-foreground">
+                                    <SelectContent className="bg-gray text-grayInverted">
                                        {agents.map((agent) => (
                                           <SelectItem className="focus:bg-highlight" key={agent.name} value={agent.name}>
                                              {agent.name}

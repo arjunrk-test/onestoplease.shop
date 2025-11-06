@@ -10,6 +10,11 @@ interface Product {
   image_url?: string;
   category: string;
   subcategory: string;
+  secondary_image_urls?: string[];
+  brand?: string;
+  model?: string;
+  specifications: Record<string, any>;
+  key_features?: string[];
 }
 
 interface ProductGridProps {
@@ -34,11 +39,11 @@ export default function ProductGrid({
   return (
     <>
       <div className="mb-6 mt-8">
-        <label className="mr-2 text-sm font-medium">Filter by Subcategory:</label>
+        <label className="mr-2 text-sm text-foreground font-medium">Filter by Subcategory:</label>
         <select
           value={selectedSubcategory}
           onChange={(e) => setSelectedSubcategory(e.target.value)}
-          className="px-3 py-1 border border-gray-300 rounded-md bg-background text-foreground text-sm"
+          className="px-3 py-1 border border-gray-300 rounded-md bg-gray text-foreground text-sm"
         >
           {subcategories.map((sub) => (
             <option key={sub} value={sub}>
@@ -48,7 +53,7 @@ export default function ProductGrid({
         </select>
       </div>
 
-      <div className="overflow-y-auto mt-4 pr-1 scrollbar-hide">
+      <div className="overflow-y-auto mt-4 pr-1 text-foreground scrollbar-hide">
         {loading ? (
           <p>Loading products...</p>
         ) : products.length === 0 ? (

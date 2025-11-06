@@ -134,7 +134,7 @@ export default function AddAdmin() {
 
       <div className="flex justify-center">
         <Button
-          className="bg-green-500 hover:bg-green-600"
+          className="bg-green-500 hover:bg-green-600 text-foreground"
           onClick={() => {
             if (!form.name || !form.email || !form.phone || !form.password || !form.confirmPassword) {
               toast.error("Please fill out all fields.");
@@ -184,16 +184,16 @@ export default function AddAdmin() {
           <div className="flex gap-2 text-sm items-center">
             <Button
               variant="default"
-              className="h-6 bg-yellow-500 hover:bg-yellow-600 text-sm"
+              className="h-6 bg-yellow-500 hover:bg-yellow-600 text-sm text-foreground"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((prev) => prev - 1)}
             >
               Prev
             </Button>
-            <span>Page {currentPage} of {Math.ceil(filteredAdmins.length / ITEMS_PER_PAGE)}</span>
+            <span className="text-foreground">Page {currentPage} of {Math.ceil(filteredAdmins.length / ITEMS_PER_PAGE)}</span>
             <Button
               variant="default"
-              className="h-6 bg-yellow-500 hover:bg-yellow-600 text-sm"
+              className="h-6 bg-yellow-500 hover:bg-yellow-600 text-sm text-foreground"
               disabled={currentPage === Math.ceil(filteredAdmins.length / ITEMS_PER_PAGE)}
               onClick={() => setCurrentPage((prev) => prev + 1)}
             >
@@ -206,7 +206,7 @@ export default function AddAdmin() {
           <p className="text-muted">No admins found.</p>
         ) : (
           <Table>
-            <TableHeader>
+            <TableHeader className="text-foreground">
               <TableRow>
                 <TableHead>S.No.</TableHead>
                 <TableHead>Name</TableHead>
@@ -216,7 +216,7 @@ export default function AddAdmin() {
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="text-foreground">
               {paginatedAdmins.map((admin, index) => (
                 <TableRow key={admin.id}>
                   <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>

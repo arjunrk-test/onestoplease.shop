@@ -111,8 +111,8 @@ export default function AgentLogsPage() {
                   variant="default"
                   className={
                     agent.logged_in
-                      ? "bg-green-500 text-white"
-                      : "bg-red-500 text-white"
+                      ? "bg-green-500 text-foreground"
+                      : "bg-red-500 text-foreground"
                   }
                 >
                   {agent.logged_in ? "Online" : "Offline"}
